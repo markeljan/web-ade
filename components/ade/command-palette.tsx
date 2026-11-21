@@ -20,6 +20,7 @@ import {
   Copy,
   Globe,
   Layers,
+  Lock,
   MessageSquare,
   Mic,
   Moon,
@@ -52,6 +53,7 @@ export interface CommandPaletteProps {
   activeChatId?: string;
   models: ModelDefinition[];
   activeModelId: string;
+  isUserBilled?: boolean;
   activeHarness: HarnessMode;
   workbenchOpen: boolean;
   activeWorkbenchTab: WorkbenchTab;
@@ -112,6 +114,7 @@ export function CommandPalette({
   activeChatId,
   models,
   activeModelId,
+  isUserBilled = false,
   activeHarness,
   workbenchOpen,
   activeWorkbenchTab,
@@ -366,24 +369,46 @@ export function CommandPalette({
               <CommandGroupLabel className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                 Models
               </CommandGroupLabel>
-              {models.map((m) => (
-                <CommandItem
-                  key={m.id}
-                  value={`model:${m.id}`}
-                  label={`${m.name} (${m.id})`}
-                  keywords={[m.provider, m.tier, ...m.capabilities]}
-                  className="flex items-center gap-2.5 rounded-[var(--radius-inner,8px)] px-2.5 py-1.5 cursor-pointer data-[highlighted]:bg-muted"
-                >
-                  <Bot className="h-3.5 w-3.5 text-muted-foreground" />
-                  <div className="min-w-0 flex-1">
-                    <CommandItemText className="font-medium text-foreground">
-                      {m.name}
-                    </CommandItemText>
-                    <span className="ml-2 font-mono text-[10px] text-muted-foreground">{m.id}</span>
-                  </div>
-                  {activeModelId === m.id && <Check className="h-3.5 w-3.5 text-[var(--accent)]" />}
-                </CommandItem>
-              ))}
+              {models.map((m) => {
+                const isLocked = !isUserBilled && !m.sponsoredEligible;
+                return (
+                  <CommandItem
+                    key={m.id}
+                    value={`model:${m.id}`}
+                    label={`${m.name} (${m.id})`}
+                    keywords={[
+                      m.provider,
+                      m.tier,
+                      isLocked ? 'byok' : 'sponsored',
+                      ...m.capabilities,
+                    ]}
+                    className={cn(
+                      'flex items-center gap-2.5 rounded-[var(--radius-inner,8px)] px-2.5 py-1.5 cursor-pointer data-[highlighted]:bg-muted',
+                      isLocked && 'opacity-70',
+                    )}
+                  >
+                    <Bot className="h-3.5 w-3.5 text-muted-foreground" />
+                    <div className="min-w-0 flex-1">
+                      <CommandItemText className="font-medium text-foreground">
+                        {m.name}
+                      </CommandItemText>
+                      <span className="ml-2 font-mono text-[10px] text-muted-foreground">
+                        {m.id}
+                      </span>
+                    </div>
+                    {isLocked ? (
+                      <span className="inline-flex items-center gap-0.5 rounded bg-muted px-1.5 py-0.5 font-mono text-[9px] uppercase text-muted-foreground">
+                        <Lock className="h-2.5 w-2.5" />
+                        BYOK
+                      </span>
+                    ) : (
+                      activeModelId === m.id && (
+                        <Check className="h-3.5 w-3.5 text-[var(--accent)]" />
+                      )
+                    )}
+                  </CommandItem>
+                );
+              })}
             </CommandGroup>
 
             {/* Recent Chats */}

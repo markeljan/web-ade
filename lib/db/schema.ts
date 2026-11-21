@@ -89,7 +89,7 @@ export const chat = pgTable(
     title: text('title').notNull().default('New chat'),
     visibility: text('visibility').$type<ChatVisibility>().notNull().default('private'),
     harnessMode: text('harness_mode').$type<HarnessMode>().notNull().default('ai-sdk'),
-    modelId: text('model_id').notNull().default('anthropic/claude-sonnet-5.5'),
+    modelId: text('model_id').notNull().default('anthropic/claude-haiku-5.5'),
     sandboxName: text('sandbox_name'),
     pinned: boolean('pinned').notNull().default(false),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

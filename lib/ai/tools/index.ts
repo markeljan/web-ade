@@ -578,11 +578,11 @@ export async function createAdeTools(options: CreateAdeToolsOptions): Promise<To
     }),
 
     /* ---------------------------------------------------------------------- */
-    /* Multimodal Image Generation (Gemini 3.1 Flash Image / GPT Image 2)     */
+    /* Multimodal Image Generation (OpenAI GPT Image 2)                       */
     /* ---------------------------------------------------------------------- */
     generate_image: tool({
       description:
-        'Generate a high-craft image from a text prompt using Google Gemini 3.1 Flash Image (via AI Gateway) or OpenAI GPT Image 2, returning a displayable URL.',
+        'Generate a high-craft image from a text prompt using OpenAI GPT Image 2, returning a displayable URL.',
       inputSchema: z.object({
         prompt: z
           .string()

@@ -127,12 +127,19 @@ describe('Next.js API route handler integration smoke tests', () => {
     );
     expect(getRes.status).toBe(200);
     const getData = (await getRes.json()) as {
-      models: unknown[];
+      models: Array<{ id: string; provider: string; sponsoredEligible?: boolean }>;
       activeBillingSource: string;
-      diagnostics: { tiers: unknown[] };
+      diagnostics: { tiers: unknown[]; sponsoredOnlyModels: boolean };
     };
     expect(Array.isArray(getData.models)).toBe(true);
-    expect(getData.models.length).toBeGreaterThanOrEqual(13);
+    expect(getData.models.length).toBe(8);
+    expect(getData.models.every((m) => m.provider === 'openai' || m.provider === 'anthropic')).toBe(
+      true,
+    );
+    expect(getData.models.filter((m) => m.sponsoredEligible).map((m) => m.id)).toEqual([
+      'anthropic/claude-haiku-5.5',
+      'openai/gpt-6-luna',
+    ]);
     expect(getData.diagnostics.tiers.length).toBe(6);
 
     const postRes = await postProviderStatusRoute(

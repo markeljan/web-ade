@@ -5,7 +5,14 @@ export const DEFAULT_OPENAI_MODEL_ID = 'openai/gpt-6.2-sol';
 export const FAST_MODEL_ID = 'anthropic/claude-haiku-5.5';
 export const FAST_OPENAI_MODEL_ID = 'openai/gpt-6-luna';
 
-export const IMAGE_GATEWAY_MODEL_ID = 'google/gemini-3.1-flash-image';
+/** Models permitted on host-sponsored tiers (no user-provided API key / custom endpoint). */
+export const SPONSORED_MODEL_IDS = [FAST_MODEL_ID, FAST_OPENAI_MODEL_ID] as const;
+export const DEFAULT_SPONSORED_MODEL_ID = FAST_MODEL_ID;
+export const DEFAULT_SPONSORED_OPENAI_MODEL_ID = FAST_OPENAI_MODEL_ID;
+
+const SPONSORED_MODEL_SET = new Set<string>(SPONSORED_MODEL_IDS);
+
+export const IMAGE_GATEWAY_MODEL_ID = 'openai/gpt-image-2';
 export const IMAGE_OPENAI_MODEL_ID = 'openai/gpt-image-2';
 export const STT_MODEL_ID = 'openai/gpt-transcribe';
 export const TTS_MODEL_ID = 'openai/tts-1';
@@ -18,11 +25,6 @@ export const GATEWAY_REALTIME_MODEL_IDS = [
   'openai/gpt-realtime-1.5',
   'openai/gpt-realtime-mini',
   'openai/gpt-live-1',
-  'google/gemini-3.8-live',
-  'google/gemini-3.8-live-extended-thinking',
-  'spacexai/grok-voice-3.0',
-  'elevenlabs/eleven-realtime-v1-max',
-  'elevenlabs/eleven-realtime-v1-mini',
 ] as const;
 
 const GATEWAY_REALTIME_MODEL_SET = new Set<string>(GATEWAY_REALTIME_MODEL_IDS);
@@ -30,14 +32,27 @@ const GATEWAY_REALTIME_MODEL_SET = new Set<string>(GATEWAY_REALTIME_MODEL_IDS);
 export const MODEL_CATALOG: readonly ModelDefinition[] = [
   // Anthropic
   {
+    id: 'anthropic/claude-haiku-5.5',
+    name: 'Claude Haiku 5.5',
+    provider: 'anthropic',
+    description:
+      'Ultra-low-latency Anthropic model for fast edits, routing, and sponsored demo sessions.',
+    contextWindow: 1_000_000,
+    capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
+    tier: 'fast',
+    sponsoredEligible: true,
+    inputCostPerMillion: 0.1,
+    outputCostPerMillion: 0.5,
+  },
+  {
     id: 'anthropic/claude-sonnet-5.5',
     name: 'Claude Sonnet 5.5',
     provider: 'anthropic',
-    description:
-      'Balanced frontier reasoning, coding, and agentic tool use. Default ADE workhorse.',
+    description: 'Balanced frontier reasoning, coding, and agentic tool use (BYOK).',
     contextWindow: 1_000_000,
     capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
     tier: 'balanced',
+    sponsoredEligible: false,
     inputCostPerMillion: 2.0,
     outputCostPerMillion: 10.0,
   },
@@ -46,35 +61,54 @@ export const MODEL_CATALOG: readonly ModelDefinition[] = [
     name: 'Claude Opus 5.5',
     provider: 'anthropic',
     description:
-      'Deepest Anthropic architecture and multi-step engineering model with extended reasoning.',
+      'Deepest Anthropic architecture and multi-step engineering model with extended reasoning (BYOK).',
     contextWindow: 1_000_000,
     capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
     tier: 'flagship',
+    sponsoredEligible: false,
     inputCostPerMillion: 4.0,
     outputCostPerMillion: 20.0,
   },
+
+  // OpenAI
   {
-    id: 'anthropic/claude-haiku-5.5',
-    name: 'Claude Haiku 5.5',
-    provider: 'anthropic',
-    description: 'Ultra-low-latency Anthropic model ideal for fast edits, routing, and summaries.',
+    id: 'openai/gpt-6-luna',
+    openaiDirectId: 'gpt-6-luna',
+    name: 'GPT-6 Luna',
+    provider: 'openai',
+    description:
+      'Blazing-fast lightweight OpenAI model for instant replies, coding, and sponsored demo sessions.',
     contextWindow: 1_000_000,
     capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
     tier: 'fast',
+    sponsoredEligible: true,
     inputCostPerMillion: 0.1,
     outputCostPerMillion: 0.5,
   },
-
-  // OpenAI
+  {
+    id: 'openai/gpt-6.1-terra',
+    openaiDirectId: 'gpt-6.1-terra',
+    name: 'GPT-6.1 Terra',
+    provider: 'openai',
+    description: 'Cost-efficient everyday OpenAI reasoning and tool-calling model (BYOK).',
+    contextWindow: 1_000_000,
+    capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
+    tier: 'balanced',
+    sponsoredEligible: false,
+    inputCostPerMillion: 1.0,
+    outputCostPerMillion: 5.0,
+  },
   {
     id: 'openai/gpt-6.2-sol',
     openaiDirectId: 'gpt-6.2-sol',
     name: 'GPT-6.2 Sol',
     provider: 'openai',
-    description: 'OpenAI flagship balanced model with strong multimodal, tool, and coding craft.',
+    description:
+      'OpenAI flagship balanced model with strong multimodal, tool, and coding craft (BYOK).',
     contextWindow: 1_000_000,
     capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
     tier: 'balanced',
+    sponsoredEligible: false,
     inputCostPerMillion: 2.0,
     outputCostPerMillion: 10.0,
   },
@@ -84,121 +118,27 @@ export const MODEL_CATALOG: readonly ModelDefinition[] = [
     name: 'GPT-6.2 Astra',
     provider: 'openai',
     description:
-      'Maximum-capability OpenAI reasoning model for complex systems design and debugging.',
+      'Maximum-capability OpenAI reasoning model for complex systems design and debugging (BYOK).',
     contextWindow: 1_000_000,
     capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
     tier: 'flagship',
+    sponsoredEligible: false,
     inputCostPerMillion: 8.0,
     outputCostPerMillion: 40.0,
-  },
-  {
-    id: 'openai/gpt-6.1-terra',
-    openaiDirectId: 'gpt-6.1-terra',
-    name: 'GPT-6.1 Terra',
-    provider: 'openai',
-    description: 'Cost-efficient everyday OpenAI reasoning and tool-calling model.',
-    contextWindow: 1_000_000,
-    capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
-    tier: 'balanced',
-    inputCostPerMillion: 1.0,
-    outputCostPerMillion: 5.0,
-  },
-  {
-    id: 'openai/gpt-6-luna',
-    openaiDirectId: 'gpt-6-luna',
-    name: 'GPT-6 Luna',
-    provider: 'openai',
-    description: 'Blazing-fast lightweight OpenAI model for instant replies, titles, and triage.',
-    contextWindow: 1_000_000,
-    capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
-    tier: 'fast',
-    inputCostPerMillion: 0.1,
-    outputCostPerMillion: 0.5,
   },
   {
     id: 'openai/gpt-5.3-codex',
     openaiDirectId: 'gpt-5.3-codex',
     name: 'GPT-5.3 Codex',
     provider: 'openai',
-    description: 'Purpose-built OpenAI software engineering model tuned for shell & repo loops.',
+    description:
+      'Purpose-built OpenAI software engineering model tuned for shell & repo loops (BYOK).',
     contextWindow: 400_000,
     capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
     tier: 'coding',
+    sponsoredEligible: false,
     inputCostPerMillion: 1.5,
     outputCostPerMillion: 6.0,
-  },
-
-  // Google
-  {
-    id: 'google/gemini-4-carbon',
-    name: 'Gemini 4 Carbon',
-    provider: 'google',
-    description: 'Google flagship 2M-context multimodal reasoning and synthesis model.',
-    contextWindow: 2_000_000,
-    capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
-    tier: 'flagship',
-    inputCostPerMillion: 3.0,
-    outputCostPerMillion: 15.0,
-  },
-  {
-    id: 'google/gemini-4-argon',
-    name: 'Gemini 4 Argon',
-    provider: 'google',
-    description: 'Balanced 2M-context Gemini 4 model for long-repo exploration and UI generation.',
-    contextWindow: 2_000_000,
-    capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
-    tier: 'balanced',
-    inputCostPerMillion: 2.0,
-    outputCostPerMillion: 10.0,
-  },
-  {
-    id: 'google/gemini-4-hydrogen',
-    name: 'Gemini 4 Hydrogen',
-    provider: 'google',
-    description:
-      'Efficiency-tuned 2M-context Gemini 4 model for fast multi-file analysis and coding.',
-    contextWindow: 2_000_000,
-    capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
-    tier: 'balanced',
-    inputCostPerMillion: 1.5,
-    outputCostPerMillion: 7.5,
-  },
-  {
-    id: 'google/gemini-3.8-flash',
-    name: 'Gemini 3.8 Flash',
-    provider: 'google',
-    description:
-      'High-speed multimodal Gemini model supporting vision, audio, and dense documents.',
-    contextWindow: 1_000_000,
-    capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning', 'audio'],
-    tier: 'fast',
-    inputCostPerMillion: 0.75,
-    outputCostPerMillion: 3.75,
-  },
-
-  // SpaceXAI
-  {
-    id: 'spacexai/grok-4.7',
-    name: 'Grok 4.7',
-    provider: 'spacexai',
-    description: 'Sharp technical reasoning and tool execution from SpaceXAI.',
-    contextWindow: 500_000,
-    capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
-    tier: 'balanced',
-    inputCostPerMillion: 2.0,
-    outputCostPerMillion: 6.0,
-  },
-  {
-    id: 'spacexai/grok-4.20-multi-agent',
-    name: 'Grok 4.20 Multi-Agent',
-    provider: 'spacexai',
-    description:
-      '2M-context multi-agent Grok architecture for parallel synthesis and investigation.',
-    contextWindow: 2_000_000,
-    capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
-    tier: 'flagship',
-    inputCostPerMillion: 1.25,
-    outputCostPerMillion: 2.5,
   },
 ] as const;
 
@@ -237,6 +177,103 @@ export function isOpenAIModelId(modelId: string): boolean {
     return false;
   }
   return DIRECT_OPENAI_PREFIX_RE.test(normalized);
+}
+
+/** Check whether a model ID targets Anthropic (`anthropic/...`). */
+export function isAnthropicModelId(modelId: string): boolean {
+  return modelId.trim().startsWith('anthropic/');
+}
+
+/** Check whether a model ID belongs to the enabled OpenAI + Anthropic provider allowlist. */
+export function isAllowedProviderModelId(modelId: string): boolean {
+  const normalized = modelId.trim();
+  if (!normalized) {
+    return false;
+  }
+  return isAnthropicModelId(normalized) || isOpenAIModelId(normalized);
+}
+
+/** Check whether a model ID is eligible on host-sponsored tiers (Claude Haiku 5.5 or GPT-6 Luna). */
+export function isSponsoredModelId(modelId?: string | null): boolean {
+  const normalized = modelId?.trim();
+  if (!normalized) {
+    return false;
+  }
+  if (SPONSORED_MODEL_SET.has(normalized)) {
+    return true;
+  }
+  return normalized === stripProviderPrefix(FAST_OPENAI_MODEL_ID);
+}
+
+/**
+ * Clamp a requested model ID to the OpenAI + Anthropic allowlist for user-billed Gateway calls.
+ */
+export function resolveAllowedProviderModelId(
+  requestedModelId?: string | null,
+  fallbackModelId = DEFAULT_MODEL_ID,
+): { modelId: string; clamped: boolean; reason?: string } {
+  const trimmed = requestedModelId?.trim();
+  if (!trimmed) {
+    return { modelId: fallbackModelId, clamped: false };
+  }
+  if (isAnthropicModelId(trimmed)) {
+    return { modelId: trimmed, clamped: false };
+  }
+  if (isOpenAIModelId(trimmed)) {
+    return {
+      modelId: trimmed.startsWith('openai/') ? trimmed : `openai/${trimmed}`,
+      clamped: false,
+    };
+  }
+  return {
+    modelId: fallbackModelId,
+    clamped: true,
+    reason: `Only OpenAI and Anthropic models are enabled. Mapped ${trimmed} to ${fallbackModelId}.`,
+  };
+}
+
+/**
+ * Clamp any requested model ID on host-sponsored tiers strictly to
+ * `anthropic/claude-haiku-5.5` or `openai/gpt-6-luna`.
+ */
+export function resolveSponsoredModelId(
+  requestedModelId?: string | null,
+  options?: { openaiOnly?: boolean },
+): { modelId: string; clamped: boolean; reason?: string } {
+  const trimmed = requestedModelId?.trim();
+
+  if (options?.openaiOnly) {
+    const isExactLuna =
+      !trimmed ||
+      trimmed === FAST_OPENAI_MODEL_ID ||
+      trimmed === stripProviderPrefix(FAST_OPENAI_MODEL_ID);
+    return {
+      modelId: FAST_OPENAI_MODEL_ID,
+      clamped: !isExactLuna,
+      reason: isExactLuna
+        ? undefined
+        : `Sponsored demo mode is limited to Claude Haiku 5.5 and GPT-6 Luna. Mapped ${trimmed} to ${FAST_OPENAI_MODEL_ID} — add your own API key in Settings to unlock all OpenAI & Anthropic models.`,
+    };
+  }
+
+  if (!trimmed) {
+    return { modelId: DEFAULT_SPONSORED_MODEL_ID, clamped: false };
+  }
+
+  if (trimmed === FAST_MODEL_ID) {
+    return { modelId: FAST_MODEL_ID, clamped: false };
+  }
+
+  if (trimmed === FAST_OPENAI_MODEL_ID || trimmed === stripProviderPrefix(FAST_OPENAI_MODEL_ID)) {
+    return { modelId: FAST_OPENAI_MODEL_ID, clamped: false };
+  }
+
+  const target = isOpenAIModelId(trimmed) ? FAST_OPENAI_MODEL_ID : FAST_MODEL_ID;
+  return {
+    modelId: target,
+    clamped: true,
+    reason: `Sponsored demo mode is limited to Claude Haiku 5.5 and GPT-6 Luna. Mapped ${trimmed} to ${target} — add your own API key in Settings to unlock all OpenAI & Anthropic models.`,
+  };
 }
 
 /** Strip a leading `provider/` prefix from a Gateway model ID. */
@@ -284,9 +321,7 @@ export function toOpenAIDirectModelId(modelId?: string | null): string {
 }
 
 /**
- * Coerce any requested model ID to a verified Vercel AI Gateway Realtime model ID.
- * Non-realtime chat models (e.g. `anthropic/claude-sonnet-5.5`, `openai/gpt-6.2-sol`)
- * are always coerced to `openai/gpt-realtime-2`.
+ * Coerce any requested model ID to a verified OpenAI Realtime model ID on Vercel AI Gateway.
  */
 export function toGatewayRealtimeModelId(modelId?: string | null): string {
   const trimmed = modelId?.trim();
@@ -310,7 +345,7 @@ export function toOpenAIDirectRealtimeModelId(modelId?: string | null): string {
   return REALTIME_OPENAI_DIRECT_MODEL_ID;
 }
 
-/** Group curated catalog entries by provider family for model picker UIs. */
+/** Group curated catalog entries by provider family (Anthropic & OpenAI) for model picker UIs. */
 export function getModelsByProvider(): Record<
   Exclude<ModelProviderFamily, 'custom'>,
   ModelDefinition[]
@@ -318,8 +353,6 @@ export function getModelsByProvider(): Record<
   const grouped: Record<Exclude<ModelProviderFamily, 'custom'>, ModelDefinition[]> = {
     anthropic: [],
     openai: [],
-    google: [],
-    spacexai: [],
   };
 
   for (const model of MODEL_CATALOG) {

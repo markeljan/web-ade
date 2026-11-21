@@ -23,6 +23,7 @@ import {
   ImageIcon,
   Layers,
   Loader2,
+  Lock,
   Mic,
   MicOff,
   Paperclip,
@@ -51,7 +52,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { getModelDefinition, getModelsByProvider } from '@/lib/ai/models';
+import { getModelDefinition, getModelsByProvider, isSponsoredModelId } from '@/lib/ai/models';
 import type {
   AttachmentItem,
   BillingSourceInfo,
@@ -158,8 +159,6 @@ const SLASH_COMMANDS: SlashCommandMeta[] = [
 const PROVIDER_LABELS: Record<string, string> = {
   anthropic: 'Anthropic',
   openai: 'OpenAI',
-  google: 'Google Gemini',
-  spacexai: 'SpaceXAI Grok',
 };
 
 function flattenFilePaths(entries: WorkspaceFileEntry[]): string[] {
@@ -770,36 +769,78 @@ export function Composer({
               <DropdownMenuContent
                 side="top"
                 align="start"
-                className="max-h-80 w-72 overflow-y-auto"
+                className="max-h-80 w-76 overflow-y-auto"
               >
+                {!billingInfo.isUserBilled && billingInfo.source !== 'unconfigured' && (
+                  <div className="mb-1 flex items-center justify-between gap-2 rounded-[var(--radius-inner)] bg-[var(--bg-surface-subtle)] px-2.5 py-1.5 text-[10px] text-[var(--fg-muted)]">
+                    <span>Sponsored: Haiku 5.5 &amp; GPT-6 Luna only</span>
+                    <button
+                      type="button"
+                      onClick={onOpenSettings}
+                      className="shrink-0 cursor-pointer font-medium text-[var(--accent)] hover:underline"
+                    >
+                      Add key →
+                    </button>
+                  </div>
+                )}
                 {Object.entries(groupedModels).map(([provider, list], idx) => (
                   <div key={provider}>
                     {idx > 0 && <DropdownMenuSeparator />}
                     <DropdownMenuLabel>{PROVIDER_LABELS[provider] ?? provider}</DropdownMenuLabel>
-                    {list.map((m) => (
-                      <DropdownMenuItem
-                        key={m.id}
-                        onClick={() => onChangeModel(m.id)}
-                        className="flex items-start justify-between gap-2 py-1.5"
-                      >
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <span className="truncate text-xs font-medium text-[var(--fg-primary)]">
-                              {m.name}
-                            </span>
-                            <span className="rounded bg-[var(--bg-surface-subtle)] px-1 py-0.5 font-mono text-[9px] uppercase text-[var(--fg-muted)]">
-                              {m.tier}
-                            </span>
+                    {list.map((m) => {
+                      const isSponsoredTier =
+                        !billingInfo.isUserBilled && billingInfo.source !== 'unconfigured';
+                      const sponsoredEligible = m.sponsoredEligible ?? isSponsoredModelId(m.id);
+                      const isLocked = isSponsoredTier && !sponsoredEligible;
+
+                      return (
+                        <DropdownMenuItem
+                          key={m.id}
+                          onClick={() => {
+                            if (isLocked) {
+                              toast.info(
+                                `${m.name} requires your own OpenAI or AI Gateway key. Add one in Settings to unlock.`,
+                              );
+                              onOpenSettings();
+                              return;
+                            }
+                            onChangeModel(m.id);
+                          }}
+                          className={cn(
+                            'flex items-start justify-between gap-2 py-1.5',
+                            isLocked && 'opacity-65',
+                          )}
+                        >
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <span className="truncate text-xs font-medium text-[var(--fg-primary)]">
+                                {m.name}
+                              </span>
+                              <span className="rounded bg-[var(--bg-surface-subtle)] px-1 py-0.5 font-mono text-[9px] uppercase text-[var(--fg-muted)]">
+                                {m.tier}
+                              </span>
+                              {isSponsoredTier && sponsoredEligible && (
+                                <span className="rounded bg-[var(--accent)]/12 px-1 py-0.5 font-mono text-[9px] font-medium uppercase text-[var(--accent)]">
+                                  Sponsored
+                                </span>
+                              )}
+                              {isLocked && (
+                                <span className="inline-flex items-center gap-0.5 rounded bg-[var(--bg-surface-subtle)] px-1 py-0.5 font-mono text-[9px] uppercase text-[var(--fg-muted)]">
+                                  <Lock className="size-2.5" />
+                                  BYOK
+                                </span>
+                              )}
+                            </div>
+                            <div className="truncate text-[10px] text-[var(--fg-muted)]">
+                              {m.description}
+                            </div>
                           </div>
-                          <div className="truncate text-[10px] text-[var(--fg-muted)]">
-                            {m.description}
-                          </div>
-                        </div>
-                        {modelId === m.id && (
-                          <Check className="mt-0.5 size-3.5 shrink-0 text-[var(--accent)]" />
-                        )}
-                      </DropdownMenuItem>
-                    ))}
+                          {modelId === m.id && !isLocked && (
+                            <Check className="mt-0.5 size-3.5 shrink-0 text-[var(--accent)]" />
+                          )}
+                        </DropdownMenuItem>
+                      );
+                    })}
                   </div>
                 ))}
               </DropdownMenuContent>

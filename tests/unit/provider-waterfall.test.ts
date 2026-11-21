@@ -14,8 +14,12 @@ import {
 import {
   DEFAULT_MODEL_ID,
   DEFAULT_OPENAI_MODEL_ID,
+  DEFAULT_SPONSORED_MODEL_ID,
+  DEFAULT_SPONSORED_OPENAI_MODEL_ID,
+  FAST_MODEL_ID,
   FAST_OPENAI_MODEL_ID,
   MODEL_CATALOG,
+  SPONSORED_MODEL_IDS,
   toOpenAIDirectModelId,
 } from '@/lib/ai/models';
 import {
@@ -191,7 +195,7 @@ describe('5-tier provider & billing waterfall', () => {
     });
 
     const resolved = await resolveLanguageModel({
-      modelId: 'google/gemini-4-carbon',
+      modelId: 'anthropic/claude-opus-5.5',
       userVercelAuth: {
         accessToken: token,
       },
@@ -199,9 +203,20 @@ describe('5-tier provider & billing waterfall', () => {
 
     expect(capturedAuthHeader).toBe(`Bearer ${token}`);
     expect(resolved.billingSource).toBe('user-vercel-oauth');
-    expect(resolved.modelId).toBe('google/gemini-4-carbon');
+    expect(resolved.modelId).toBe('anthropic/claude-opus-5.5');
     expect(resolved.creditsRemaining).toBe(18.75);
     expect(resolved.billingInfo.isUserBilled).toBe(true);
+
+    // Non-OpenAI/Anthropic models are still rejected even with user OAuth tokens
+    const clampedNonAllowed = await resolveLanguageModel({
+      modelId: 'google/gemini-4-carbon',
+      userVercelAuth: {
+        accessToken: token,
+      },
+    });
+    expect(clampedNonAllowed.billingSource).toBe('user-vercel-oauth');
+    expect(clampedNonAllowed.modelId).toBe(DEFAULT_MODEL_ID);
+    expect(clampedNonAllowed.fallbackReason).toContain('Only OpenAI and Anthropic');
 
     // Subsequent credits lookup should be cached.
     const cachedCheck = await checkVercelGatewayCredits(token);
@@ -419,32 +434,34 @@ describe('5-tier provider & billing waterfall', () => {
     expect(isUserTokenBillingError(new Error('Context length exceeded'))).toBe(false);
   });
 
-  it('Tier 3 (sponsor-openai) prioritizes OPENAI_API_KEY BEFORE AI_GATEWAY_API_KEY when both are present', async () => {
+  it('Tier 3 (sponsor-openai) prioritizes OPENAI_API_KEY BEFORE AI_GATEWAY_API_KEY and clamps to GPT-6 Luna', async () => {
     process.env.OPENAI_API_KEY = 'sk-host-openai-primary';
     process.env.AI_GATEWAY_API_KEY = 'vck_host_gateway_secondary';
     process.env.VERCEL_OIDC_TOKEN = 'oidc_tertiary';
 
-    // Default (no modelId specified) MUST select sponsor-openai first!
+    // Default (no modelId specified) MUST select sponsor-openai first with sponsored GPT-6 Luna!
     const defaultRes = await resolveLanguageModel();
     expect(defaultRes.billingSource).toBe('sponsor-openai');
-    expect(defaultRes.modelId).toBe(DEFAULT_OPENAI_MODEL_ID);
+    expect(defaultRes.modelId).toBe(DEFAULT_SPONSORED_OPENAI_MODEL_ID);
 
-    // Explicit OpenAI model MUST use sponsor-openai (direct) rather than AI Gateway!
+    // Flagship OpenAI model requested without BYOK MUST clamp to sponsored GPT-6 Luna!
     const explicitOpenAI = await resolveLanguageModel({ modelId: 'openai/gpt-5.3-codex' });
     expect(explicitOpenAI.billingSource).toBe('sponsor-openai');
-    expect(explicitOpenAI.modelId).toBe('openai/gpt-5.3-codex');
+    expect(explicitOpenAI.modelId).toBe(FAST_OPENAI_MODEL_ID);
+    expect(explicitOpenAI.fallbackReason).toContain('Sponsored demo mode');
 
-    // Fast model helper also picks OpenAI fast model first when OPENAI_API_KEY is present
+    // Fast model helper picks OpenAI GPT-6 Luna without clamping
     const fastRes = await resolveFastLanguageModel();
     expect(fastRes.billingSource).toBe('sponsor-openai');
     expect(fastRes.modelId).toBe(FAST_OPENAI_MODEL_ID);
 
-    // Diagnostics default active source MUST be sponsor-openai
+    // Diagnostics default active source MUST be sponsor-openai with sponsoredOnlyModels = true
     const diagnostics = await getProviderDiagnostics();
     expect(diagnostics.activeBillingSource).toBe('sponsor-openai');
-    expect(diagnostics.defaultModelId).toBe(DEFAULT_OPENAI_MODEL_ID);
+    expect(diagnostics.defaultModelId).toBe(DEFAULT_SPONSORED_OPENAI_MODEL_ID);
+    expect(diagnostics.sponsoredOnlyModels).toBe(true);
 
-    // If ONLY OPENAI_API_KEY is set (no gateway/OIDC), non-OpenAI models fall back cleanly to OpenAI
+    // If ONLY OPENAI_API_KEY is set (no gateway/OIDC), Anthropic models clamp cleanly to GPT-6 Luna
     delete process.env.AI_GATEWAY_API_KEY;
     delete process.env.VERCEL_OIDC_TOKEN;
     const claudeOnlyOpenAI = await resolveLanguageModel({
@@ -452,39 +469,80 @@ describe('5-tier provider & billing waterfall', () => {
     });
     expect(claudeOnlyOpenAI.billingSource).toBe('sponsor-openai');
     expect(claudeOnlyOpenAI.modelId).toBe(FAST_OPENAI_MODEL_ID);
-    expect(claudeOnlyOpenAI.fallbackReason).toContain('OPENAI_API_KEY');
+    expect(claudeOnlyOpenAI.fallbackReason).toContain('Sponsored demo mode');
     expect(toOpenAIDirectModelId('openai/gpt-6.2-sol')).toBe('gpt-6.2-sol');
   });
 
-  it('Tier 4 (sponsor-gateway) is used when OPENAI_API_KEY is absent OR non-OpenAI model is explicitly requested', async () => {
+  it('Tier 4 (sponsor-gateway) is used when OPENAI_API_KEY is absent OR Anthropic is requested, clamped to Haiku 5.5 & GPT-6 Luna', async () => {
     process.env.AI_GATEWAY_API_KEY = 'vck_host_gateway_tier4';
     process.env.VERCEL_OIDC_TOKEN = 'oidc_tier5';
 
-    // Without OPENAI_API_KEY -> Tier 4 beats Tier 5
+    // Without OPENAI_API_KEY -> Tier 4 beats Tier 5 and defaults to sponsored Claude Haiku 5.5
     const noOpenAI = await resolveLanguageModel();
     expect(noOpenAI.billingSource).toBe('sponsor-gateway');
-    expect(noOpenAI.modelId).toBe(DEFAULT_MODEL_ID);
+    expect(noOpenAI.modelId).toBe(DEFAULT_SPONSORED_MODEL_ID);
 
-    // With BOTH OPENAI_API_KEY and AI_GATEWAY_API_KEY, explicit Anthropic model routes to Tier 4 Gateway
+    // Explicit GPT-6 Luna is allowed on sponsored Gateway
+    const sponsoredLuna = await resolveLanguageModel({ modelId: 'openai/gpt-6-luna' });
+    expect(sponsoredLuna.billingSource).toBe('sponsor-gateway');
+    expect(sponsoredLuna.modelId).toBe(FAST_OPENAI_MODEL_ID);
+    expect(sponsoredLuna.fallbackReason).toBeUndefined();
+
+    // Flagship OpenAI model clamps to GPT-6 Luna on sponsored Gateway
+    const clampedSol = await resolveLanguageModel({ modelId: 'openai/gpt-6.2-sol' });
+    expect(clampedSol.billingSource).toBe('sponsor-gateway');
+    expect(clampedSol.modelId).toBe(FAST_OPENAI_MODEL_ID);
+    expect(clampedSol.fallbackReason).toContain('Sponsored demo mode');
+
+    // With BOTH OPENAI_API_KEY and AI_GATEWAY_API_KEY, explicit Anthropic flagship clamps to Haiku 5.5 via Tier 4
     process.env.OPENAI_API_KEY = 'sk-host-openai-tier3';
     const explicitClaude = await resolveLanguageModel({
       modelId: 'anthropic/claude-sonnet-5.5',
     });
     expect(explicitClaude.billingSource).toBe('sponsor-gateway');
-    expect(explicitClaude.modelId).toBe('anthropic/claude-sonnet-5.5');
-    expect(explicitClaude.fallbackReason).toContain('Routed non-OpenAI model');
+    expect(explicitClaude.modelId).toBe(FAST_MODEL_ID);
+    expect(explicitClaude.fallbackReason).toContain('Sponsored demo mode');
   });
 
-  it('Tier 5 (vercel-oidc) acts as zero-config fallback when VERCEL_OIDC_TOKEN is set', async () => {
+  it('Tier 5 (vercel-oidc) acts as zero-config fallback and enforces Haiku 5.5 & GPT-6 Luna only', async () => {
     process.env.VERCEL_OIDC_TOKEN = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.oidc_payload.sig';
 
     const resolved = await resolveLanguageModel();
     expect(resolved.billingSource).toBe('vercel-oidc');
-    expect(resolved.modelId).toBe(DEFAULT_MODEL_ID);
+    expect(resolved.modelId).toBe(DEFAULT_SPONSORED_MODEL_ID);
     expect(resolved.billingInfo.isUserBilled).toBe(false);
+
+    // Flagship models & disallowed providers MUST clamp strictly to Haiku 5.5 / GPT-6 Luna
+    const opusClamped = await resolveLanguageModel({ modelId: 'anthropic/claude-opus-5.5' });
+    expect(opusClamped.modelId).toBe(FAST_MODEL_ID);
+    expect(opusClamped.fallbackReason).toContain('Sponsored demo mode');
+
+    const astraClamped = await resolveLanguageModel({ modelId: 'openai/gpt-6.2-astra' });
+    expect(astraClamped.modelId).toBe(FAST_OPENAI_MODEL_ID);
+    expect(astraClamped.fallbackReason).toContain('Sponsored demo mode');
+
+    const googleClamped = await resolveLanguageModel({ modelId: 'google/gemini-4-carbon' });
+    expect(googleClamped.modelId).toBe(FAST_MODEL_ID);
+
+    // User BYOK key unlocks flagship Anthropic + OpenAI models immediately
+    const byokUnlocked = await resolveLanguageModel({
+      modelId: 'anthropic/claude-opus-5.5',
+      override: { byokApiKey: 'vck_user_unlocks_flagship' },
+    });
+    expect(byokUnlocked.billingSource).toBe('user-byok-gateway');
+    expect(byokUnlocked.modelId).toBe('anthropic/claude-opus-5.5');
+    expect(byokUnlocked.billingInfo.isUserBilled).toBe(true);
+
+    // Curated catalog is strictly Anthropic + OpenAI with ONLY Haiku 5.5 & GPT-6 Luna sponsored-eligible
+    const providers = new Set(MODEL_CATALOG.map((m) => m.provider));
+    expect([...providers].sort()).toEqual(['anthropic', 'openai']);
+    const sponsoredIds = MODEL_CATALOG.filter((m) => m.sponsoredEligible).map((m) => m.id);
+    expect(sponsoredIds).toEqual([...SPONSORED_MODEL_IDS]);
 
     const diagnostics = await getProviderDiagnostics();
     expect(diagnostics.activeBillingSource).toBe('vercel-oidc');
+    expect(diagnostics.defaultModelId).toBe(DEFAULT_SPONSORED_MODEL_ID);
+    expect(diagnostics.sponsoredOnlyModels).toBe(true);
     expect(diagnostics.hasOidcToken).toBe(true);
   });
 

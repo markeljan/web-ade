@@ -49,7 +49,7 @@ export type ModelCapability =
   | 'audio'
   | 'realtime';
 
-export type ModelProviderFamily = 'anthropic' | 'openai' | 'google' | 'spacexai' | 'custom';
+export type ModelProviderFamily = 'anthropic' | 'openai' | 'custom';
 
 export interface ModelDefinition {
   id: string;
@@ -61,6 +61,8 @@ export interface ModelDefinition {
   contextWindow: number;
   capabilities: ModelCapability[];
   tier: 'flagship' | 'balanced' | 'fast' | 'coding';
+  /** True when available on host-sponsored tiers without user BYOK credentials. */
+  sponsoredEligible?: boolean;
   inputCostPerMillion?: number;
   outputCostPerMillion?: number;
 }

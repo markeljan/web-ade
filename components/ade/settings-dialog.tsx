@@ -449,8 +449,10 @@ export function SettingsDialog({
                   {byokKind && <Badge variant="accent">{byokKind}</Badge>}
                 </div>
                 <p className="text-[11px] text-[var(--fg-muted)]">
-                  Paste a Vercel AI Gateway key (<code>vck_*</code>) for all 500+ models, or an
-                  OpenAI key (<code>sk-*</code>) for direct billing.
+                  Sponsored mode includes <strong>Claude Haiku 5.5</strong> and{' '}
+                  <strong>GPT-6 Luna</strong>. Paste your own Vercel AI Gateway key (
+                  <code>vck_*</code>) or OpenAI key (<code>sk-*</code>) to unlock all Anthropic
+                  &amp; OpenAI models (Sonnet 5.5, Opus 5.5, GPT-6.2 Sol/Astra, GPT-5.3 Codex).
                 </p>
                 <div className="relative">
                   <Input

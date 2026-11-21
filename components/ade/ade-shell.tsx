@@ -24,7 +24,13 @@ import type { GenUiActionHandler } from '@/components/genui/registry';
 import type { InlineAiEditRequest } from '@/components/workbench/files-editor-pane';
 import type { PromotedGenUiSpec } from '@/components/workbench/genui-canvas-pane';
 import { WorkbenchPane } from '@/components/workbench/workbench-pane';
-import { DEFAULT_MODEL_ID, MODEL_CATALOG, REALTIME_MODEL_ID } from '@/lib/ai/models';
+import {
+  DEFAULT_SPONSORED_MODEL_ID,
+  isSponsoredModelId,
+  MODEL_CATALOG,
+  REALTIME_MODEL_ID,
+  resolveSponsoredModelId,
+} from '@/lib/ai/models';
 import type { ProviderDiagnostics } from '@/lib/ai/provider';
 import {
   readStoredAstryxPalette,
@@ -140,9 +146,20 @@ export function AdeShell({
   // Chat & Runtime state
   const [chats, setChats] = useState<SidebarChatItem[]>(initialChats);
   const [chatTitle, setChatTitle] = useState(initialTitle);
-  const [modelId, setModelId] = useState(
-    initialModelId || initialDiagnostics?.defaultModelId || DEFAULT_MODEL_ID,
-  );
+  const [modelId, setModelId] = useState(() => {
+    const initial =
+      initialModelId || initialDiagnostics?.defaultModelId || DEFAULT_SPONSORED_MODEL_ID;
+    const isInitialSponsored =
+      initialDiagnostics &&
+      !initialDiagnostics.activeBillingInfo.isUserBilled &&
+      initialDiagnostics.activeBillingSource !== 'unconfigured';
+    if (isInitialSponsored && !isSponsoredModelId(initial)) {
+      return resolveSponsoredModelId(initial, {
+        openaiOnly: initialDiagnostics.activeBillingSource === 'sponsor-openai',
+      }).modelId;
+    }
+    return initial;
+  });
   const [harnessMode, setHarnessMode] = useState<HarnessMode>(initialHarnessMode);
   const [sandboxTier, setSandboxTier] = useState<SandboxTier>('just-bash');
   const [isStreaming, setIsStreaming] = useState(false);
@@ -355,6 +372,34 @@ export function AdeShell({
       setSettingsOpen(true);
     },
     [],
+  );
+
+  const isSponsoredMode = !billingInfo.isUserBilled && billingInfo.source !== 'unconfigured';
+
+  useEffect(() => {
+    if (!isSponsoredMode) return;
+    if (isSponsoredModelId(modelId)) return;
+    const clamped = resolveSponsoredModelId(modelId, {
+      openaiOnly: billingInfo.source === 'sponsor-openai',
+    }).modelId;
+    if (clamped !== modelId) {
+      setModelId(clamped);
+    }
+  }, [isSponsoredMode, billingInfo.source, modelId]);
+
+  const handleSelectModel = useCallback(
+    (nextModel: string) => {
+      if (isSponsoredMode && !isSponsoredModelId(nextModel)) {
+        const entry = models.find((m) => m.id === nextModel);
+        toast.info(
+          `${entry?.name ?? nextModel} requires your own OpenAI or AI Gateway key. Add one in Settings to unlock.`,
+        );
+        handleOpenSettings('providers');
+        return;
+      }
+      setModelId(nextModel);
+    },
+    [isSponsoredMode, models, handleOpenSettings],
   );
 
   const handleOpenWorkbench = useCallback(
@@ -734,7 +779,7 @@ export function AdeShell({
         setWorkbenchOpen(true);
         setActiveTab(tab);
       },
-      onSetModel: (nextModel) => setModelId(nextModel),
+      onSetModel: (nextModel) => handleSelectModel(nextModel),
       onSetHarness: (nextHarness) => setHarnessMode(nextHarness),
       onOpenCommandPalette: () => setCommandPaletteOpen(true),
       onOpenSettings: (tab) =>
@@ -778,6 +823,7 @@ export function AdeShell({
     handleThemeChange,
     handlePaletteChange,
     handleOpenSettings,
+    handleSelectModel,
     handleNewChat,
   ]);
 
@@ -894,7 +940,7 @@ export function AdeShell({
               initialVotes={initialVotes}
               models={models}
               modelId={modelId}
-              onChangeModel={setModelId}
+              onChangeModel={handleSelectModel}
               harnessMode={harnessMode}
               onChangeHarness={setHarnessMode}
               sandboxTier={sandboxTier}
@@ -1035,6 +1081,7 @@ export function AdeShell({
         activeChatId={chatId}
         models={models}
         activeModelId={modelId}
+        isUserBilled={billingInfo.isUserBilled}
         activeHarness={harnessMode}
         workbenchOpen={workbenchOpen}
         activeWorkbenchTab={activeTab}
@@ -1042,7 +1089,7 @@ export function AdeShell({
         palette={palette}
         onSelectChat={handleSelectChat}
         onNewChat={handleNewChat}
-        onSelectModel={setModelId}
+        onSelectModel={handleSelectModel}
         onSelectHarness={setHarnessMode}
         onToggleWorkbench={(open) =>
           setWorkbenchOpen((prev) => (typeof open === 'boolean' ? open : !prev))

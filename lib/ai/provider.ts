@@ -13,11 +13,16 @@ import {
 import {
   DEFAULT_MODEL_ID,
   DEFAULT_OPENAI_MODEL_ID,
+  DEFAULT_SPONSORED_MODEL_ID,
+  DEFAULT_SPONSORED_OPENAI_MODEL_ID,
   FAST_MODEL_ID,
   FAST_OPENAI_MODEL_ID,
-  IMAGE_GATEWAY_MODEL_ID,
   IMAGE_OPENAI_MODEL_ID,
+  isAnthropicModelId,
   isOpenAIModelId,
+  resolveAllowedProviderModelId,
+  resolveSponsoredModelId,
+  SPONSORED_MODEL_IDS,
   STT_MODEL_ID,
   stripProviderPrefix,
   TTS_MODEL_ID,
@@ -158,6 +163,9 @@ export interface ProviderDiagnostics {
   activeBillingSource: BillingSource;
   activeBillingInfo: BillingSourceInfo;
   defaultModelId: string;
+  /** True when active billing is host-sponsored and restricted to Claude Haiku 5.5 + GPT-6 Luna. */
+  sponsoredOnlyModels: boolean;
+  sponsoredModelIds: readonly string[];
   fallbackReason?: string;
   vercelOAuthConfigured: boolean;
   vercelConnectConfigured: boolean;
@@ -630,7 +638,13 @@ async function resolveBackend(
   // -------------------------------------------------------------------------
   if (parsed.byokApiKey && parsed.byokKind) {
     if (parsed.byokKind === 'gateway') {
-      const targetModel = explicitModelId ?? opts.defaultModelOverride ?? DEFAULT_MODEL_ID;
+      const allowed = resolveAllowedProviderModelId(
+        explicitModelId ?? opts.defaultModelOverride ?? DEFAULT_MODEL_ID,
+        DEFAULT_MODEL_ID,
+      );
+      if (allowed.reason) {
+        fallbackNotes.push(allowed.reason);
+      }
       return {
         kind: 'gateway',
         provider: createGateway({
@@ -640,10 +654,11 @@ async function resolveBackend(
         }),
         apiKey: parsed.byokApiKey,
         teamIdOrSlug: parsed.teamIdOrSlug,
-        modelId: targetModel,
+        modelId: allowed.modelId,
         headers: parsed.headers,
         billingSource: 'user-byok-gateway',
-        billingInfo: getBillingSourceInfo('user-byok-gateway', { detail: targetModel }),
+        billingInfo: getBillingSourceInfo('user-byok-gateway', { detail: allowed.modelId }),
+        fallbackReason: fallbackNotes.join(' ') || undefined,
       };
     }
 
@@ -702,7 +717,13 @@ async function resolveBackend(
   if (!opts.skipUserToken && opts.userVercelAuth?.accessToken) {
     const userOAuth = await resolveUserVercelOAuthToken(opts.userVercelAuth, parsed.teamIdOrSlug);
     if (userOAuth.usable && userOAuth.accessToken) {
-      const targetModel = explicitModelId ?? opts.defaultModelOverride ?? DEFAULT_MODEL_ID;
+      const allowed = resolveAllowedProviderModelId(
+        explicitModelId ?? opts.defaultModelOverride ?? DEFAULT_MODEL_ID,
+        DEFAULT_MODEL_ID,
+      );
+      if (allowed.reason) {
+        fallbackNotes.push(allowed.reason);
+      }
       const effectiveTeam = trimNonEmpty(opts.userVercelAuth.teamIdOrSlug) ?? parsed.teamIdOrSlug;
       const balance = userOAuth.credits?.balance ?? null;
 
@@ -715,13 +736,14 @@ async function resolveBackend(
         }),
         apiKey: userOAuth.accessToken,
         teamIdOrSlug: effectiveTeam,
-        modelId: targetModel,
+        modelId: allowed.modelId,
         headers: parsed.headers,
         billingSource: 'user-vercel-oauth',
         billingInfo: getBillingSourceInfo('user-vercel-oauth', {
           creditsRemaining: balance,
-          detail: targetModel,
+          detail: allowed.modelId,
         }),
+        fallbackReason: fallbackNotes.join(' ') || undefined,
         creditsRemaining: balance,
       };
     }
@@ -732,18 +754,17 @@ async function resolveBackend(
   }
 
   // -------------------------------------------------------------------------
-  // Tier 3 — Host Sponsor `OPENAI_API_KEY` FIRST
+  // Tier 3 — Host Sponsor `OPENAI_API_KEY` FIRST (strictly GPT-6 Luna unless
+  // routing Anthropic requests to sponsored Gateway Claude Haiku 5.5)
   // -------------------------------------------------------------------------
   if (env.openAIKey) {
-    const wantsOpenAI = !explicitModelId || isOpenAIModelId(explicitModelId);
-    if (wantsOpenAI || !hasGatewayHostFallback) {
-      const requested = explicitModelId ?? opts.defaultModelOverride ?? DEFAULT_OPENAI_MODEL_ID;
-      const directModelId = toOpenAIDirectModelId(requested);
+    const wantsAnthropic = Boolean(explicitModelId && isAnthropicModelId(explicitModelId));
+    if (!wantsAnthropic || !hasGatewayHostFallback) {
+      const sponsored = resolveSponsoredModelId(explicitModelId, { openaiOnly: true });
+      const directModelId = stripProviderPrefix(sponsored.modelId);
 
-      if (explicitModelId && !isOpenAIModelId(explicitModelId) && !hasGatewayHostFallback) {
-        fallbackNotes.push(
-          `Host only has OPENAI_API_KEY configured; mapped ${explicitModelId} to ${directModelId}.`,
-        );
+      if (sponsored.reason) {
+        fallbackNotes.push(sponsored.reason);
       }
 
       return {
@@ -758,37 +779,43 @@ async function resolveBackend(
     }
 
     fallbackNotes.push(
-      `Routed non-OpenAI model ${explicitModelId} via AI Gateway (host OPENAI_API_KEY remains primary for OpenAI models).`,
+      `Routed Anthropic request via AI Gateway (host OPENAI_API_KEY remains primary for OpenAI models).`,
     );
   }
 
   // -------------------------------------------------------------------------
-  // Tier 4 — Host Sponsor `AI_GATEWAY_API_KEY`
+  // Tier 4 — Host Sponsor `AI_GATEWAY_API_KEY` (strictly Haiku 5.5 + GPT-6 Luna)
   // -------------------------------------------------------------------------
   if (env.gatewayKey) {
-    const targetModel = explicitModelId ?? opts.defaultModelOverride ?? DEFAULT_MODEL_ID;
+    const sponsored = resolveSponsoredModelId(explicitModelId ?? opts.defaultModelOverride);
+    if (sponsored.reason) {
+      fallbackNotes.push(sponsored.reason);
+    }
     return {
       kind: 'gateway',
       provider: createGateway({ apiKey: env.gatewayKey }),
       apiKey: env.gatewayKey,
-      modelId: targetModel,
+      modelId: sponsored.modelId,
       billingSource: 'sponsor-gateway',
-      billingInfo: getBillingSourceInfo('sponsor-gateway', { detail: targetModel }),
+      billingInfo: getBillingSourceInfo('sponsor-gateway', { detail: sponsored.modelId }),
       fallbackReason: fallbackNotes.join(' ') || undefined,
     };
   }
 
   // -------------------------------------------------------------------------
-  // Tier 5 — Vercel Project OIDC (`VERCEL_OIDC_TOKEN`)
+  // Tier 5 — Vercel Project OIDC (`VERCEL_OIDC_TOKEN`) (strictly Haiku 5.5 + GPT-6 Luna)
   // -------------------------------------------------------------------------
   if (env.hasOidcRuntime) {
-    const targetModel = explicitModelId ?? opts.defaultModelOverride ?? DEFAULT_MODEL_ID;
+    const sponsored = resolveSponsoredModelId(explicitModelId ?? opts.defaultModelOverride);
+    if (sponsored.reason) {
+      fallbackNotes.push(sponsored.reason);
+    }
     return {
       kind: 'gateway',
       provider: gateway,
-      modelId: targetModel,
+      modelId: sponsored.modelId,
       billingSource: 'vercel-oidc',
-      billingInfo: getBillingSourceInfo('vercel-oidc', { detail: targetModel }),
+      billingInfo: getBillingSourceInfo('vercel-oidc', { detail: sponsored.modelId }),
       fallbackReason: fallbackNotes.join(' ') || undefined,
     };
   }
@@ -873,11 +900,9 @@ export async function resolveFastLanguageModel(
 }
 
 /**
- * Resolve an image generation model across the 5-tier waterfall.
- * - Gateway tiers default to `{ kind: 'language-files', model }` (`google/gemini-3.1-flash-image`
- *   used with `generateText` -> `result.files`) or `{ kind: 'image-model', model }` when
- *   `prefer: 'image-model'` or an OpenAI image model is requested.
- * - Direct OpenAI & Custom endpoints return `{ kind: 'image-model', model }` for `generateImage()`.
+ * Resolve an OpenAI image generation model across the 5-tier waterfall.
+ * - Gateway, OpenAI, and Custom tiers return `{ kind: 'image-model', model }` (`openai/gpt-image-2`)
+ *   for AI SDK 7 `generateImage()`.
  */
 export async function resolveImageGenerator(
   opts: ResolveProviderOptions & { prefer?: 'language-files' | 'image-model' } = {},
@@ -891,28 +916,13 @@ export async function resolveImageGenerator(
 
   if (backend.kind === 'gateway') {
     const requested = trimNonEmpty(opts.modelId);
-    const wantsDedicatedImageModel =
-      opts.prefer === 'image-model' ||
-      (requested !== undefined &&
-        (requested.startsWith('openai/gpt-image') || requested.includes('imagine-image')));
-
-    if (wantsDedicatedImageModel) {
-      const imageModelId = requested ?? IMAGE_OPENAI_MODEL_ID;
-      return {
-        kind: 'image-model',
-        model: backend.provider.imageModel(imageModelId),
-        modelId: imageModelId,
-        billingSource: backend.billingSource,
-        billingInfo: backend.billingInfo,
-        fallbackReason: backend.fallbackReason,
-      };
-    }
-
-    const multimodalModelId = requested ?? IMAGE_GATEWAY_MODEL_ID;
+    const imageModelId = requested?.startsWith('openai/gpt-image')
+      ? requested
+      : IMAGE_OPENAI_MODEL_ID;
     return {
-      kind: 'language-files',
-      model: backend.provider(multimodalModelId),
-      modelId: multimodalModelId,
+      kind: 'image-model',
+      model: backend.provider.imageModel(imageModelId),
+      modelId: imageModelId,
       billingSource: backend.billingSource,
       billingInfo: backend.billingInfo,
       fallbackReason: backend.fallbackReason,
@@ -1333,17 +1343,20 @@ export async function getProviderDiagnostics(
     });
   } else if (env.openAIKey) {
     activeBillingSource = 'sponsor-openai';
-    defaultModelId = DEFAULT_OPENAI_MODEL_ID;
+    defaultModelId = DEFAULT_SPONSORED_OPENAI_MODEL_ID;
     activeBillingInfo = getBillingSourceInfo('sponsor-openai');
   } else if (env.gatewayKey) {
     activeBillingSource = 'sponsor-gateway';
-    defaultModelId = DEFAULT_MODEL_ID;
+    defaultModelId = DEFAULT_SPONSORED_MODEL_ID;
     activeBillingInfo = getBillingSourceInfo('sponsor-gateway');
   } else if (env.hasOidcRuntime) {
     activeBillingSource = 'vercel-oidc';
-    defaultModelId = DEFAULT_MODEL_ID;
+    defaultModelId = DEFAULT_SPONSORED_MODEL_ID;
     activeBillingInfo = getBillingSourceInfo('vercel-oidc');
   }
+
+  const sponsoredOnlyModels =
+    !activeBillingInfo.isUserBilled && activeBillingSource !== 'unconfigured';
 
   const tiers: ProviderTierStatus[] = [
     {
@@ -1410,6 +1423,8 @@ export async function getProviderDiagnostics(
     activeBillingSource,
     activeBillingInfo,
     defaultModelId,
+    sponsoredOnlyModels,
+    sponsoredModelIds: SPONSORED_MODEL_IDS,
     fallbackReason,
     vercelOAuthConfigured: env.vercelOAuthConfigured,
     vercelConnectConfigured: env.vercelConnectConfigured,
