@@ -15,7 +15,6 @@ import {
   DEFAULT_OPENAI_MODEL_ID,
   DEFAULT_SPONSORED_MODEL_ID,
   DEFAULT_SPONSORED_OPENAI_MODEL_ID,
-  FAST_MODEL_ID,
   FAST_OPENAI_MODEL_ID,
   IMAGE_OPENAI_MODEL_ID,
   isAnthropicModelId,
@@ -887,15 +886,9 @@ export async function resolveLanguageModel(
 export async function resolveFastLanguageModel(
   opts: ResolveProviderOptions = {},
 ): Promise<ResolvedLanguageModel> {
-  const env = readEnvCredentials();
-  const fastDefault =
-    !opts.modelId && env.openAIKey && !opts.override?.byokApiKey?.startsWith('vck_')
-      ? FAST_OPENAI_MODEL_ID
-      : FAST_MODEL_ID;
-
   return resolveLanguageModel({
     ...opts,
-    modelId: opts.modelId ?? fastDefault,
+    modelId: opts.modelId ?? FAST_OPENAI_MODEL_ID,
   });
 }
 

@@ -5,8 +5,8 @@ import { schema } from './schema';
 export type AdeDatabase = NeonHttpDatabase<typeof schema>;
 
 interface GlobalDbCache {
-  __minimalAdeDb?: AdeDatabase;
-  __minimalAdeDbUrl?: string;
+  __webAdeDb?: AdeDatabase;
+  __webAdeDbUrl?: string;
 }
 
 const globalCache = globalThis as unknown as GlobalDbCache;
@@ -28,15 +28,15 @@ export function getDb(): AdeDatabase {
     );
   }
 
-  if (globalCache.__minimalAdeDb && globalCache.__minimalAdeDbUrl === connectionString) {
-    return globalCache.__minimalAdeDb;
+  if (globalCache.__webAdeDb && globalCache.__webAdeDbUrl === connectionString) {
+    return globalCache.__webAdeDb;
   }
 
   const sql = neon(connectionString);
   const db = drizzle(sql, { schema });
 
-  globalCache.__minimalAdeDb = db;
-  globalCache.__minimalAdeDbUrl = connectionString;
+  globalCache.__webAdeDb = db;
+  globalCache.__webAdeDbUrl = connectionString;
 
   return db;
 }

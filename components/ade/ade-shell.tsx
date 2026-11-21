@@ -57,7 +57,7 @@ import type {
 import { useUiAgent } from '@/lib/ui-agent/bridge';
 import { cn, generateId } from '@/lib/utils';
 
-const PROVIDER_SETTINGS_STORAGE_KEY = 'minimal-ade:provider-settings';
+const PROVIDER_SETTINGS_STORAGE_KEY = 'web-ade:provider-settings';
 
 export interface AdeShellSessionUser {
   userId: string;
@@ -170,7 +170,7 @@ export function AdeShell({
     initialDiagnostics?.activeBillingInfo ?? {
       source: 'unconfigured',
       label: 'Resolving provider…',
-      providerName: 'Minimal ADE',
+      providerName: 'Web ADE',
       isUserBilled: false,
     },
   );

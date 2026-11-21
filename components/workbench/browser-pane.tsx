@@ -96,7 +96,7 @@ export function BrowserPane({
   const [activeMode, setActiveMode] = useState<BrowserStreamMode>(controlledMode ?? 'preview');
   const [urlInput, setUrlInput] = useState<string>(controlledUrl ?? 'workspace://index.html');
   const [currentUrl, setCurrentUrl] = useState<string>(controlledUrl ?? 'workspace://index.html');
-  const [pageTitle, setPageTitle] = useState<string>('Minimal ADE · Live Workspace Preview');
+  const [pageTitle, setPageTitle] = useState<string>('Web ADE · Live Workspace Preview');
   const [viewportPreset, setViewportPreset] = useState<ViewportPreset>('desktop');
   const [hasControl, setHasControl] = useState<boolean>(controlledHumanControl ?? false);
   const [isLoading, setIsLoading] = useState<boolean>(false);

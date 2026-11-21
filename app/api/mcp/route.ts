@@ -116,7 +116,7 @@ const baseHandler = createMcpHandler(
       {
         title: 'List Workspace Files',
         description:
-          'List files in a Minimal ADE session workspace (defaults to caller-scoped workspace).',
+          'List files in a Web ADE session workspace (defaults to caller-scoped workspace).',
         inputSchema: z.object({
           chatId: z
             .string()
@@ -158,7 +158,7 @@ const baseHandler = createMcpHandler(
       'workspace_read_file',
       {
         title: 'Read Workspace File',
-        description: 'Read a text file from a Minimal ADE session workspace.',
+        description: 'Read a text file from a Web ADE session workspace.',
         inputSchema: z.object({
           chatId: z
             .string()
@@ -202,7 +202,7 @@ const baseHandler = createMcpHandler(
       {
         title: 'Write Workspace File',
         description:
-          'Create or update a file inside a Minimal ADE session workspace (requires owner auth or ADE_MCP_TOKEN).',
+          'Create or update a file inside a Web ADE session workspace (requires owner auth or ADE_MCP_TOKEN).',
         inputSchema: z.object({
           chatId: z
             .string()
@@ -257,7 +257,7 @@ const baseHandler = createMcpHandler(
       {
         title: 'Run Workspace Shell Command',
         description:
-          'Run a non-destructive shell command in the Minimal ADE workspace (requires owner auth or ADE_MCP_TOKEN; destructive commands are blocked).',
+          'Run a non-destructive shell command in the Web ADE workspace (requires owner auth or ADE_MCP_TOKEN; destructive commands are blocked).',
         inputSchema: z.object({
           chatId: z
             .string()
@@ -274,7 +274,7 @@ const baseHandler = createMcpHandler(
             content: [
               {
                 type: 'text',
-                text: `Blocked destructive command over remote MCP ("${command}"). Execute destructive commands inside the Minimal ADE UI with Sentinel approval.`,
+                text: `Blocked destructive command over remote MCP ("${command}"). Execute destructive commands inside the Web ADE UI with Sentinel approval.`,
               },
             ],
           };
@@ -313,7 +313,7 @@ const baseHandler = createMcpHandler(
       {
         title: 'Open URL & Capture Snapshot',
         description:
-          'Navigate the Minimal ADE embedded browser to a public URL (or workspace://index.html) and return its accessibility tree snapshot and readable summary.',
+          'Navigate the Web ADE embedded browser to a public URL (or workspace://index.html) and return its accessibility tree snapshot and readable summary.',
         inputSchema: z.object({
           chatId: z
             .string()
@@ -356,7 +356,7 @@ const baseHandler = createMcpHandler(
   },
   {
     serverInfo: {
-      name: 'minimal-ade',
+      name: 'web-ade',
       version: '0.1.0',
     },
   },
@@ -373,7 +373,7 @@ async function handleMcpRequest(request: Request): Promise<Response> {
       { error: 'Unauthorized: valid Bearer token required for /api/mcp.' },
       {
         status: 401,
-        headers: { 'WWW-Authenticate': 'Bearer realm="minimal-ade-mcp"' },
+        headers: { 'WWW-Authenticate': 'Bearer realm="web-ade-mcp"' },
       },
     );
   }

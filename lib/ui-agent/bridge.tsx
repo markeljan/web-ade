@@ -131,7 +131,7 @@ const DEFAULT_SNAPSHOT: UiAgentSnapshot = {
   route: '/',
   theme: 'system',
   palette: 'neutral',
-  modelId: 'anthropic/claude-haiku-5.5',
+  modelId: 'openai/gpt-6-luna',
   harnessMode: 'ai-sdk',
   workbenchOpen: false,
   activeTab: 'preview',
@@ -163,7 +163,7 @@ function normalizeSdkComponent(comp: AgentComponent): UiAgentComponentSummary {
 function buildCoreAdeTargets(state: UiAgentControllerBindings): UiAgentComponentSummary[] {
   const theme = state.theme ?? 'system';
   const palette = state.palette ?? 'neutral';
-  const modelId = state.modelId ?? 'anthropic/claude-haiku-5.5';
+  const modelId = state.modelId ?? 'openai/gpt-6-luna';
   const harnessMode = state.harnessMode ?? 'ai-sdk';
   const workbenchOpen = Boolean(state.workbenchOpen);
   const activeTab = state.activeTab ?? 'preview';

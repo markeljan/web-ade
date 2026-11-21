@@ -280,7 +280,7 @@ export function Sidebar({
             </span>
             <div className="leading-tight">
               <div className="text-xs font-semibold tracking-tight text-[var(--fg-primary)]">
-                Minimal ADE
+                Web ADE
               </div>
               <div className="font-mono text-[9.5px] text-[var(--fg-muted)]">AI SDK 7 · Astryx</div>
             </div>

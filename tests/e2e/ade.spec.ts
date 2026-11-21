@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('Minimal ADE End-to-End Verification', () => {
+test.describe('Web ADE End-to-End Verification', () => {
   test('loads cleanly with Astryx tokens, theme switching, composer, ⌘K, Settings, UI Bridge, Workbench tabs, and @wterm mount', async ({
     page,
   }) => {
@@ -47,7 +47,7 @@ test.describe('Minimal ADE End-to-End Verification', () => {
     await expect(page.locator('section[aria-label="Workspace Workbench"]')).toHaveCount(0);
 
     // 3. Verify Composer & Starter Prompt Cards
-    const composer = page.getByRole('textbox', { name: 'Message Minimal ADE' });
+    const composer = page.getByRole('textbox', { name: 'Message Web ADE' });
     await expect(composer).toBeVisible();
     await expect(page.getByText('Build an interactive web app')).toBeVisible();
 
@@ -177,7 +177,7 @@ test.describe('Minimal ADE End-to-End Verification', () => {
     );
     await expect(workbench.getByText('README.md').first()).toBeVisible();
     await workbench.getByText('index.html').first().click();
-    await expect(workbench.getByText('Minimal ADE').first()).toBeVisible();
+    await expect(workbench.getByText('Web ADE').first()).toBeVisible();
 
     // GenUI Canvas tab
     await tablist.getByRole('tab', { name: /GenUI/i }).click();

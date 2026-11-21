@@ -33,7 +33,7 @@ describe('adeCatalog, GenUI codegen, Sentinel safety, and /api/mcp', () => {
   });
 
   afterEach(() => {
-    delete (globalThis as Record<string, unknown>).__minimalAdeDbAdapter;
+    delete (globalThis as Record<string, unknown>).__webAdeDbAdapter;
   });
 
   it('validates all 13 adeCatalog components (valid props pass, invalid props fail)', () => {

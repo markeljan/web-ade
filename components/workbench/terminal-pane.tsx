@@ -145,7 +145,7 @@ export function TerminalPane({
         TERM: 'xterm-256color',
       },
       greeting: [
-        '\x1b[1;34mMinimal ADE\x1b[0m · \x1b[32mInstant Bash (WASM)\x1b[0m  (\x1b[90m@wterm/react + @wterm/just-bash\x1b[0m)',
+        '\x1b[1;34mWeb ADE\x1b[0m · \x1b[32mInstant Bash (WASM)\x1b[0m  (\x1b[90m@wterm/react + @wterm/just-bash\x1b[0m)',
         '\x1b[90mType `ls`, `cat README.md`, or switch to Cloud Sandbox for a full Linux VM.\x1b[0m',
       ],
       prompt: (cwd) => {
@@ -267,7 +267,7 @@ export function TerminalPane({
         cloudLineRef.current = '';
         writeTerm('\x1b[2J\x1b[H');
         writeTerm(
-          '\x1b[1;36mMinimal ADE\x1b[0m · \x1b[35mCloud Sandbox (VM)\x1b[0m  (\x1b[90m@vercel/sandbox · ports 3000/4848/8080\x1b[0m)\r\n',
+          '\x1b[1;36mWeb ADE\x1b[0m · \x1b[35mCloud Sandbox (VM)\x1b[0m  (\x1b[90m@vercel/sandbox · ports 3000/4848/8080\x1b[0m)\r\n',
         );
         writeTerm(
           '\x1b[90mCommands execute in your persistent Linux microVM (auto-falls back to Tier 1 if unconfigured).\x1b[0m\r\n',

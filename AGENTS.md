@@ -1,6 +1,6 @@
-# minimal-ade — Agent Engineering Handbook
+# web-ade — Agent Engineering Handbook
 
-`minimal-ade` is an open-source **Web Agent Development Environment (ADE)** built on **Next.js 16**, **React 19**, **AI SDK 7**, **Bun**, **Vercel Labs** (`@ui-sdk/react`, `@json-render/*`, `streamdown`, `libfx`, `just-bash`, `bash-tool`, `@wterm/*`, `@agent-browser/sandbox`, `screen-relay`, `mcp-handler`, `@github-tools/sdk`), and the **Astryx Design Language**.
+`web-ade` is an open-source **Web Agent Development Environment (ADE)** built on **Next.js 16**, **React 19**, **AI SDK 7**, **Bun**, **Vercel Labs** (`@ui-sdk/react`, `@json-render/*`, `streamdown`, `libfx`, `just-bash`, `bash-tool`, `@wterm/*`, `@agent-browser/sandbox`, `screen-relay`, `mcp-handler`, `@github-tools/sdk`), and the **Astryx Design Language**.
 
 ## Core Architecture & Non-Negotiable Rules
 

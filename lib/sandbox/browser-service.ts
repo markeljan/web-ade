@@ -120,16 +120,16 @@ interface StoredBrowserSession {
 }
 
 const globalBrowserState = globalThis as typeof globalThis & {
-  __minimalAdeBrowserSessions?: Map<string, StoredBrowserSession>;
-  __minimalAdeLocalAgentBrowserChecked?: boolean;
-  __minimalAdeLocalAgentBrowserAvailable?: boolean;
+  __webAdeBrowserSessions?: Map<string, StoredBrowserSession>;
+  __webAdeLocalAgentBrowserChecked?: boolean;
+  __webAdeLocalAgentBrowserAvailable?: boolean;
 };
 
 function getSessionMap(): Map<string, StoredBrowserSession> {
-  if (!globalBrowserState.__minimalAdeBrowserSessions) {
-    globalBrowserState.__minimalAdeBrowserSessions = new Map();
+  if (!globalBrowserState.__webAdeBrowserSessions) {
+    globalBrowserState.__webAdeBrowserSessions = new Map();
   }
-  return globalBrowserState.__minimalAdeBrowserSessions;
+  return globalBrowserState.__webAdeBrowserSessions;
 }
 
 function getOrCreateSession(chatId: string): StoredBrowserSession {
@@ -142,7 +142,7 @@ function getOrCreateSession(chatId: string): StoredBrowserSession {
       mode: 'preview',
       backend: 'workspace-preview',
       url: 'workspace://index.html',
-      title: 'Minimal ADE · Live Workspace Preview',
+      title: 'Web ADE · Live Workspace Preview',
       history: ['workspace://index.html'],
       historyIndex: 0,
       viewport: { width: 1280, height: 800 },
@@ -184,17 +184,17 @@ function appendConsoleLog(
 }
 
 async function isLocalAgentBrowserInstalled(): Promise<boolean> {
-  if (globalBrowserState.__minimalAdeLocalAgentBrowserChecked) {
-    return Boolean(globalBrowserState.__minimalAdeLocalAgentBrowserAvailable);
+  if (globalBrowserState.__webAdeLocalAgentBrowserChecked) {
+    return Boolean(globalBrowserState.__webAdeLocalAgentBrowserAvailable);
   }
-  globalBrowserState.__minimalAdeLocalAgentBrowserChecked = true;
+  globalBrowserState.__webAdeLocalAgentBrowserChecked = true;
   try {
     await execFileAsync('agent-browser', ['--version'], { timeout: 2_000 });
-    globalBrowserState.__minimalAdeLocalAgentBrowserAvailable = true;
+    globalBrowserState.__webAdeLocalAgentBrowserAvailable = true;
   } catch {
-    globalBrowserState.__minimalAdeLocalAgentBrowserAvailable = false;
+    globalBrowserState.__webAdeLocalAgentBrowserAvailable = false;
   }
-  return Boolean(globalBrowserState.__minimalAdeLocalAgentBrowserAvailable);
+  return Boolean(globalBrowserState.__webAdeLocalAgentBrowserAvailable);
 }
 
 function parseIpv4Octets(hostname: string): [number, number, number, number] | null {
@@ -620,7 +620,7 @@ async function fetchHttpSnapshot(url: string): Promise<{
     timeoutMs: 10_000,
     maxRedirects: 5,
     headers: {
-      'user-agent': 'Minimal-ADE/1.0 (Agent Browser Snapshot)',
+      'user-agent': 'Web-ADE/1.0 (Agent Browser Snapshot)',
       accept: 'text/html,application/xhtml+xml,text/plain,application/json;q=0.9,*/*;q=0.5',
     },
   });

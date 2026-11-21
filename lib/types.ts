@@ -1,5 +1,5 @@
 /**
- * Shared TypeScript contracts for Minimal ADE.
+ * Shared TypeScript contracts for Web ADE.
  * All server routes, agent harnesses, database adapters, and UI components build against these types.
  */
 

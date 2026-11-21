@@ -18,7 +18,7 @@ interface WorkflowRunOwnership {
 }
 
 const globalWorkflowState = globalThis as typeof globalThis & {
-  __minimalAdeWorkflowRuns?: Map<string, WorkflowRunOwnership>;
+  __webAdeWorkflowRuns?: Map<string, WorkflowRunOwnership>;
 };
 
 function getRunOwnerSecret(): string | null {
@@ -80,7 +80,7 @@ function findOwnershipFromSignedCookie(
 }
 
 function resolveWorkflowRunOwner(request: Request, runId: string): WorkflowRunOwnership | null {
-  const map = globalWorkflowState.__minimalAdeWorkflowRuns;
+  const map = globalWorkflowState.__webAdeWorkflowRuns;
   const cached = map?.get(runId);
   if (cached) {
     if (Date.now() - cached.createdAt <= RUN_TTL_MS) {

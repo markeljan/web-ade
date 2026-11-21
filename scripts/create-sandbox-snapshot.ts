@@ -88,7 +88,7 @@ async function runStep(
 async function main(): Promise<void> {
   const flags = parseFlags(process.argv.slice(2));
 
-  console.log('Minimal ADE · Vercel Sandbox Snapshot Builder');
+  console.log('Web ADE · Vercel Sandbox Snapshot Builder');
   console.log('─────────────────────────────────────────────');
   console.log(`Mode: ${flags.skipDesktop ? 'Browser-only (fast)' : 'Full Desktop + Browser + fx'}`);
   console.log(`vCPUs: ${flags.vcpus}`);
@@ -125,7 +125,7 @@ async function main(): Promise<void> {
     timeout: ms('30m'),
     persistent: false,
     tags: {
-      app: 'minimal-ade',
+      app: 'web-ade',
       role: 'snapshot-builder',
     },
   });

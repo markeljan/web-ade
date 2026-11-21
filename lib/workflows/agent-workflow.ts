@@ -295,7 +295,7 @@ async function stepWebFetch(url: string, maxChars: number) {
   try {
     const { response, finalUrl } = await safeExternalFetch(url, {
       method: 'GET',
-      headers: { 'User-Agent': 'MinimalADE-Workflow/1.0' },
+      headers: { 'User-Agent': 'WebADE-Workflow/1.0' },
       maxRedirects: 5,
       timeoutMs: 10_000,
     });
@@ -405,7 +405,7 @@ export async function adeAgentWorkflow(input: AdeWorkflowInput): Promise<AdeWork
     input.providerKind === 'openai' ? openai(toOpenAIDirectModelId(input.modelId)) : input.modelId;
 
   const agent = new WorkflowAgent({
-    id: 'minimal-ade-workflow-agent',
+    id: 'web-ade-workflow-agent',
     model,
     instructions,
     stopWhen: isStepCount(12),

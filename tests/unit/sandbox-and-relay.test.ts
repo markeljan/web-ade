@@ -56,7 +56,7 @@ describe('dual-tier sandbox, SSRF protection, and screen-relay grant security', 
 
   afterEach(() => {
     globalThis.fetch = originalFetch;
-    delete (globalThis as Record<string, unknown>).__minimalAdeDbAdapter;
+    delete (globalThis as Record<string, unknown>).__webAdeDbAdapter;
 
     for (const key of ENV_KEYS) {
       const prev = savedEnv[key];
@@ -79,11 +79,11 @@ describe('dual-tier sandbox, SSRF protection, and screen-relay grant security', 
     const readme = await readFile(chatId, 'README.md', 'just-bash');
     expect(readme.tier).toBe('just-bash');
     expect(readme.language).toBe('markdown');
-    expect(readme.content).toContain('Minimal ADE Workspace');
+    expect(readme.content).toContain('Web ADE Workspace');
 
     const indexHtml = await readFile(chatId, 'index.html', 'just-bash');
     expect(indexHtml.language).toBe('html');
-    expect(indexHtml.content).toContain('Minimal ADE Sandbox Ready');
+    expect(indexHtml.content).toContain('Web ADE Sandbox Ready');
   });
 
   it('executes Tier 1 just-bash commands and syncs created/modified/deleted file diffs', async () => {
@@ -188,7 +188,7 @@ describe('dual-tier sandbox, SSRF protection, and screen-relay grant security', 
     expect(preview.ok).toBe(true);
     expect(preview.mode).toBe('preview');
     expect(preview.backend).toBe('workspace-preview');
-    expect(preview.htmlPreview).toContain('Minimal ADE Sandbox Ready');
+    expect(preview.htmlPreview).toContain('Web ADE Sandbox Ready');
     // DNS-verified SSRF guard rejects private IPs and bounded body reader enforces byte cap
     const dnsBlocked = await validateExternalUrlWithDns('http://169.254.169.254/latest/meta-data/');
     expect(dnsBlocked.ok).toBe(false);

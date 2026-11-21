@@ -69,21 +69,21 @@ function createEmptyStore(): LocalStoreData {
 }
 
 interface GlobalLocalStoreState {
-  __minimalAdeLocalStore?: LocalStoreData;
-  __minimalAdeLocalStoreLoaded?: boolean;
-  __minimalAdeLocalStorePath?: string;
-  __minimalAdeLocalStoreReadOnly?: boolean;
-  __minimalAdeLocalStoreQueue?: Promise<unknown>;
+  __webAdeLocalStore?: LocalStoreData;
+  __webAdeLocalStoreLoaded?: boolean;
+  __webAdeLocalStorePath?: string;
+  __webAdeLocalStoreReadOnly?: boolean;
+  __webAdeLocalStoreQueue?: Promise<unknown>;
 }
 
 const globalState = globalThis as unknown as GlobalLocalStoreState;
 
 function getDefaultStorePath(): string {
-  return path.join(process.cwd(), '.minimal-ade-data', 'store.json');
+  return path.join(process.cwd(), '.web-ade-data', 'store.json');
 }
 
 function getFallbackStorePath(): string {
-  return path.join('/tmp', '.minimal-ade-data', 'store.json');
+  return path.join('/tmp', '.web-ade-data', 'store.json');
 }
 
 function normalizeStore(raw: unknown): LocalStoreData {
@@ -102,8 +102,8 @@ function normalizeStore(raw: unknown): LocalStoreData {
 }
 
 async function loadFromDisk(): Promise<LocalStoreData> {
-  if (globalState.__minimalAdeLocalStoreLoaded && globalState.__minimalAdeLocalStore) {
-    return globalState.__minimalAdeLocalStore;
+  if (globalState.__webAdeLocalStoreLoaded && globalState.__webAdeLocalStore) {
+    return globalState.__webAdeLocalStore;
   }
 
   const candidatePaths = [getDefaultStorePath(), getFallbackStorePath()];
@@ -111,9 +111,9 @@ async function loadFromDisk(): Promise<LocalStoreData> {
     try {
       const content = await readFile(/*turbopackIgnore: true*/ candidate, 'utf8');
       const parsed = normalizeStore(JSON.parse(content));
-      globalState.__minimalAdeLocalStore = parsed;
-      globalState.__minimalAdeLocalStoreLoaded = true;
-      globalState.__minimalAdeLocalStorePath = candidate;
+      globalState.__webAdeLocalStore = parsed;
+      globalState.__webAdeLocalStoreLoaded = true;
+      globalState.__webAdeLocalStorePath = candidate;
       return parsed;
     } catch {
       // Try next candidate or initialize empty store below.
@@ -121,20 +121,20 @@ async function loadFromDisk(): Promise<LocalStoreData> {
   }
 
   const empty = createEmptyStore();
-  globalState.__minimalAdeLocalStore = empty;
-  globalState.__minimalAdeLocalStoreLoaded = true;
-  globalState.__minimalAdeLocalStorePath = getDefaultStorePath();
+  globalState.__webAdeLocalStore = empty;
+  globalState.__webAdeLocalStoreLoaded = true;
+  globalState.__webAdeLocalStorePath = getDefaultStorePath();
   return empty;
 }
 
 async function persistToDisk(data: LocalStoreData): Promise<void> {
-  if (globalState.__minimalAdeLocalStoreReadOnly) {
+  if (globalState.__webAdeLocalStoreReadOnly) {
     return;
   }
 
   const serialized = JSON.stringify(data, null, 2);
-  const targets = globalState.__minimalAdeLocalStorePath
-    ? [globalState.__minimalAdeLocalStorePath, getFallbackStorePath()]
+  const targets = globalState.__webAdeLocalStorePath
+    ? [globalState.__webAdeLocalStorePath, getFallbackStorePath()]
     : [getDefaultStorePath(), getFallbackStorePath()];
 
   for (const targetPath of new Set(targets)) {
@@ -143,19 +143,19 @@ async function persistToDisk(data: LocalStoreData): Promise<void> {
       const tempPath = `${targetPath}.${process.pid}.${Date.now()}.tmp`;
       await writeFile(/*turbopackIgnore: true*/ tempPath, serialized, 'utf8');
       await rename(/*turbopackIgnore: true*/ tempPath, /*turbopackIgnore: true*/ targetPath);
-      globalState.__minimalAdeLocalStorePath = targetPath;
+      globalState.__webAdeLocalStorePath = targetPath;
       return;
     } catch {
       // Try fallback path; if all fail, remain in memory without crashing.
     }
   }
 
-  globalState.__minimalAdeLocalStoreReadOnly = true;
+  globalState.__webAdeLocalStoreReadOnly = true;
 }
 
 /** Reads the local JSON store (used only when DATABASE_URL is absent). */
 export async function readLocalStore(): Promise<LocalStoreData> {
-  const previous = globalState.__minimalAdeLocalStoreQueue ?? Promise.resolve();
+  const previous = globalState.__webAdeLocalStoreQueue ?? Promise.resolve();
   await previous.catch(() => undefined);
   return loadFromDisk();
 }
@@ -164,7 +164,7 @@ export async function readLocalStore(): Promise<LocalStoreData> {
 export async function mutateLocalStore<T>(
   mutator: (store: LocalStoreData) => T | Promise<T>,
 ): Promise<T> {
-  const previous = globalState.__minimalAdeLocalStoreQueue ?? Promise.resolve();
+  const previous = globalState.__webAdeLocalStoreQueue ?? Promise.resolve();
   const nextOperation = previous
     .catch(() => undefined)
     .then(async () => {
@@ -174,6 +174,6 @@ export async function mutateLocalStore<T>(
       return result;
     });
 
-  globalState.__minimalAdeLocalStoreQueue = nextOperation;
+  globalState.__webAdeLocalStoreQueue = nextOperation;
   return nextOperation;
 }

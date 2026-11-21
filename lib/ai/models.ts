@@ -6,8 +6,8 @@ export const FAST_MODEL_ID = 'anthropic/claude-haiku-5.5';
 export const FAST_OPENAI_MODEL_ID = 'openai/gpt-6-luna';
 
 /** Models permitted on host-sponsored tiers (no user-provided API key / custom endpoint). */
-export const SPONSORED_MODEL_IDS = [FAST_MODEL_ID, FAST_OPENAI_MODEL_ID] as const;
-export const DEFAULT_SPONSORED_MODEL_ID = FAST_MODEL_ID;
+export const SPONSORED_MODEL_IDS = [FAST_OPENAI_MODEL_ID, FAST_MODEL_ID] as const;
+export const DEFAULT_SPONSORED_MODEL_ID = FAST_OPENAI_MODEL_ID;
 export const DEFAULT_SPONSORED_OPENAI_MODEL_ID = FAST_OPENAI_MODEL_ID;
 
 const SPONSORED_MODEL_SET = new Set<string>(SPONSORED_MODEL_IDS);
@@ -30,46 +30,6 @@ export const GATEWAY_REALTIME_MODEL_IDS = [
 const GATEWAY_REALTIME_MODEL_SET = new Set<string>(GATEWAY_REALTIME_MODEL_IDS);
 
 export const MODEL_CATALOG: readonly ModelDefinition[] = [
-  // Anthropic
-  {
-    id: 'anthropic/claude-haiku-5.5',
-    name: 'Claude Haiku 5.5',
-    provider: 'anthropic',
-    description:
-      'Ultra-low-latency Anthropic model for fast edits, routing, and sponsored demo sessions.',
-    contextWindow: 1_000_000,
-    capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
-    tier: 'fast',
-    sponsoredEligible: true,
-    inputCostPerMillion: 0.1,
-    outputCostPerMillion: 0.5,
-  },
-  {
-    id: 'anthropic/claude-sonnet-5.5',
-    name: 'Claude Sonnet 5.5',
-    provider: 'anthropic',
-    description: 'Balanced frontier reasoning, coding, and agentic tool use (BYOK).',
-    contextWindow: 1_000_000,
-    capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
-    tier: 'balanced',
-    sponsoredEligible: false,
-    inputCostPerMillion: 2.0,
-    outputCostPerMillion: 10.0,
-  },
-  {
-    id: 'anthropic/claude-opus-5.5',
-    name: 'Claude Opus 5.5',
-    provider: 'anthropic',
-    description:
-      'Deepest Anthropic architecture and multi-step engineering model with extended reasoning (BYOK).',
-    contextWindow: 1_000_000,
-    capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
-    tier: 'flagship',
-    sponsoredEligible: false,
-    inputCostPerMillion: 4.0,
-    outputCostPerMillion: 20.0,
-  },
-
   // OpenAI
   {
     id: 'openai/gpt-6-luna',
@@ -77,7 +37,7 @@ export const MODEL_CATALOG: readonly ModelDefinition[] = [
     name: 'GPT-6 Luna',
     provider: 'openai',
     description:
-      'Blazing-fast lightweight OpenAI model for instant replies, coding, and sponsored demo sessions.',
+      'Default fast OpenAI model for instant replies, coding, and sponsored demo sessions.',
     contextWindow: 1_000_000,
     capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
     tier: 'fast',
@@ -139,6 +99,46 @@ export const MODEL_CATALOG: readonly ModelDefinition[] = [
     sponsoredEligible: false,
     inputCostPerMillion: 1.5,
     outputCostPerMillion: 6.0,
+  },
+
+  // Anthropic
+  {
+    id: 'anthropic/claude-haiku-5.5',
+    name: 'Claude Haiku 5.5',
+    provider: 'anthropic',
+    description:
+      'Ultra-low-latency Anthropic model for fast edits, routing, and sponsored demo sessions.',
+    contextWindow: 1_000_000,
+    capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
+    tier: 'fast',
+    sponsoredEligible: true,
+    inputCostPerMillion: 0.1,
+    outputCostPerMillion: 0.5,
+  },
+  {
+    id: 'anthropic/claude-sonnet-5.5',
+    name: 'Claude Sonnet 5.5',
+    provider: 'anthropic',
+    description: 'Balanced frontier reasoning, coding, and agentic tool use (BYOK).',
+    contextWindow: 1_000_000,
+    capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
+    tier: 'balanced',
+    sponsoredEligible: false,
+    inputCostPerMillion: 2.0,
+    outputCostPerMillion: 10.0,
+  },
+  {
+    id: 'anthropic/claude-opus-5.5',
+    name: 'Claude Opus 5.5',
+    provider: 'anthropic',
+    description:
+      'Deepest Anthropic architecture and multi-step engineering model with extended reasoning (BYOK).',
+    contextWindow: 1_000_000,
+    capabilities: ['text', 'vision', 'file-input', 'tools', 'reasoning'],
+    tier: 'flagship',
+    sponsoredEligible: false,
+    inputCostPerMillion: 4.0,
+    outputCostPerMillion: 20.0,
   },
 ] as const;
 
@@ -268,11 +268,11 @@ export function resolveSponsoredModelId(
     return { modelId: FAST_OPENAI_MODEL_ID, clamped: false };
   }
 
-  const target = isOpenAIModelId(trimmed) ? FAST_OPENAI_MODEL_ID : FAST_MODEL_ID;
+  const target = isAnthropicModelId(trimmed) ? FAST_MODEL_ID : FAST_OPENAI_MODEL_ID;
   return {
     modelId: target,
     clamped: true,
-    reason: `Sponsored demo mode is limited to Claude Haiku 5.5 and GPT-6 Luna. Mapped ${trimmed} to ${target} — add your own API key in Settings to unlock all OpenAI & Anthropic models.`,
+    reason: `Sponsored demo mode is limited to GPT-6 Luna and Claude Haiku 5.5. Mapped ${trimmed} to ${target} — add your own API key in Settings to unlock all OpenAI & Anthropic models.`,
   };
 }
 
@@ -351,8 +351,8 @@ export function getModelsByProvider(): Record<
   ModelDefinition[]
 > {
   const grouped: Record<Exclude<ModelProviderFamily, 'custom'>, ModelDefinition[]> = {
-    anthropic: [],
     openai: [],
+    anthropic: [],
   };
 
   for (const model of MODEL_CATALOG) {

@@ -157,7 +157,7 @@ const STARTER_PROMPTS: SuggestionItem[] = [
     description:
       'Watch the assistant inspect live @ui-sdk/react/agent targets and control palette, theme, and Workbench panes.',
     prompt:
-      'Call ui_snapshot to inspect my live Minimal ADE workspace controls, then propose a ui_act command to switch to the Matcha Astryx palette, open the Workbench, and jump to the Trace Waterfall tab.',
+      'Call ui_snapshot to inspect my live Web ADE workspace controls, then propose a ui_act command to switch to the Matcha Astryx palette, open the Workbench, and jump to the Trace Waterfall tab.',
     badge: '@ui-sdk/agent',
     icon: <Wand2 className="size-3.5" />,
     targetTab: 'trace',
@@ -1212,7 +1212,7 @@ export function ChatPane({
                                 <Bot className="size-3.5" />
                               </span>
                               <span className="shrink-0 text-xs font-semibold text-[var(--fg-primary)]">
-                                Minimal ADE
+                                Web ADE
                               </span>
                               {msg.metadata?.modelId && (
                                 <span className="truncate font-mono text-[10.5px] text-[var(--fg-muted)]">
@@ -1439,7 +1439,7 @@ export function ChatPane({
                                           </span>
                                           <a
                                             href={imageOutput.url}
-                                            download="minimal-ade-image.png"
+                                            download="web-ade-image.png"
                                             className="inline-flex shrink-0 items-center gap-1 rounded-[var(--radius-inner)] px-2 py-1 text-[11px] font-medium text-[var(--fg-primary)] hover:bg-[var(--overlay-hover)]"
                                           >
                                             <Download className="size-3" />

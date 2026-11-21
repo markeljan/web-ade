@@ -48,15 +48,15 @@ interface FxToolSessionContext {
 }
 
 const globalFxState = globalThis as typeof globalThis & {
-  __minimalAdeFxAgent?: FxAgent;
-  __minimalAdeFxLeaseStorage?: AsyncLocalStorage<TurnCredentialLease>;
+  __webAdeFxAgent?: FxAgent;
+  __webAdeFxLeaseStorage?: AsyncLocalStorage<TurnCredentialLease>;
 };
 
 function getLeaseStorage(): AsyncLocalStorage<TurnCredentialLease> {
-  if (!globalFxState.__minimalAdeFxLeaseStorage) {
-    globalFxState.__minimalAdeFxLeaseStorage = new AsyncLocalStorage<TurnCredentialLease>();
+  if (!globalFxState.__webAdeFxLeaseStorage) {
+    globalFxState.__webAdeFxLeaseStorage = new AsyncLocalStorage<TurnCredentialLease>();
   }
-  return globalFxState.__minimalAdeFxLeaseStorage;
+  return globalFxState.__webAdeFxLeaseStorage;
 }
 
 /**
@@ -452,7 +452,7 @@ function selectDurability(): Durability {
   }
   try {
     return durableLocal({
-      dir: path.join(os.tmpdir(), 'minimal-ade-fx-sessions'),
+      dir: path.join(os.tmpdir(), 'web-ade-fx-sessions'),
       reserveMs: 30_000,
     });
   } catch {
@@ -467,14 +467,14 @@ function selectDurability(): Durability {
  * user credentials.
  */
 export function getFxAgent(): FxAgent {
-  if (!globalFxState.__minimalAdeFxAgent) {
+  if (!globalFxState.__webAdeFxAgent) {
     const bootstrapApiKey =
       process.env.AI_GATEWAY_API_KEY?.trim() ||
       process.env.VERCEL_OIDC_TOKEN?.trim() ||
       'fx-per-turn-injected';
 
-    globalFxState.__minimalAdeFxAgent = createFxAgent({
-      name: 'minimal-ade-fx',
+    globalFxState.__webAdeFxAgent = createFxAgent({
+      name: 'web-ade-fx',
       apiKey: bootstrapApiKey,
       durability: selectDurability(),
       instructions: buildFxSystemPrompt(),
@@ -482,7 +482,7 @@ export function getFxAgent(): FxAgent {
       fetch: createCredentialAndBudgetFetch(),
     });
   }
-  return globalFxState.__minimalAdeFxAgent;
+  return globalFxState.__webAdeFxAgent;
 }
 
 /**
@@ -582,7 +582,7 @@ export async function runFxTurn(options: RunFxTurnOptions): Promise<RunFxTurnOut
       };
 
       const ephemeralAgent = createFxAgent({
-        name: 'minimal-ade-fx-custom',
+        name: 'web-ade-fx-custom',
         durability: memory({ reserveMs: 30_000 }),
         provider: customProviderDef,
         model: credentials.modelId,

@@ -131,7 +131,7 @@ export interface WorkspaceFileRecord {
 /* Internal Helpers                                                           */
 /* -------------------------------------------------------------------------- */
 
-const DEFAULT_MODEL_ID = 'anthropic/claude-haiku-5.5';
+const DEFAULT_MODEL_ID = 'openai/gpt-6-luna';
 const DEFAULT_HARNESS_MODE: HarnessMode = 'ai-sdk';
 
 function storageBackendTag(): 'postgres' | 'local' {

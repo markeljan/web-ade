@@ -22,14 +22,26 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_APP_URL ||
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'),
+      (process.env.VERCEL_PROJECT_PRODUCTION_URL
+        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+        : process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}`
+          : 'https://web-ade.com'),
   ),
   title: {
-    default: 'Minimal ADE — Web Agent Development Environment',
-    template: '%s | Minimal ADE',
+    default: 'Web ADE — Open-Source Web Agent Development Environment',
+    template: '%s | Web ADE',
   },
   description:
     'Open-source Web Agent Development Environment powered by Next.js 16, AI SDK 7, Vercel Labs, and the Astryx Design System.',
+  openGraph: {
+    title: 'Web ADE — Open-Source Web Agent Development Environment',
+    description:
+      'Open-source Web Agent Development Environment powered by Next.js 16, AI SDK 7, Vercel Labs, and the Astryx Design System.',
+    url: 'https://web-ade.com',
+    siteName: 'Web ADE',
+    type: 'website',
+  },
 };
 
 export const viewport: Viewport = {

@@ -1,7 +1,7 @@
 ---
 name: ade-architecture
 description: >-
-  Complete architectural reference and implementation runbook for minimal-ade.
+  Complete architectural reference and implementation runbook for web-ade.
   Use this skill when designing, modifying, debugging, or verifying AI SDK 7
   streaming routes, the 5-tier provider/billing waterfall, Sign in with Vercel
   OAuth and Vercel Connect, Astryx design tokens, @ui-sdk/react agent bridge,
@@ -9,7 +9,7 @@ description: >-
   Sandbox execution, or screen-relay/agent-browser live streaming.
 ---
 
-# minimal-ade Architecture & Runbook
+# web-ade Architecture & Runbook
 
 ## 1. Stack & File Ownership Overview
 

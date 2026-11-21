@@ -42,14 +42,14 @@ interface WorkflowRunOwnership {
 }
 
 const globalWorkflowState = globalThis as typeof globalThis & {
-  __minimalAdeWorkflowRuns?: Map<string, WorkflowRunOwnership>;
+  __webAdeWorkflowRuns?: Map<string, WorkflowRunOwnership>;
 };
 
 function recordWorkflowRunOwner(runId: string, userId: string, chatId: string): void {
-  if (!globalWorkflowState.__minimalAdeWorkflowRuns) {
-    globalWorkflowState.__minimalAdeWorkflowRuns = new Map();
+  if (!globalWorkflowState.__webAdeWorkflowRuns) {
+    globalWorkflowState.__webAdeWorkflowRuns = new Map();
   }
-  const map = globalWorkflowState.__minimalAdeWorkflowRuns;
+  const map = globalWorkflowState.__webAdeWorkflowRuns;
   const now = Date.now();
   if (map.size >= MAX_CACHED_RUNS) {
     for (const [key, entry] of map) {

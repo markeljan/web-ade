@@ -9,7 +9,7 @@ import { getDb, isDatabaseConfigured } from '@/lib/db/index';
 import { transferUserOwnership } from '@/lib/db/queries';
 import { schema } from '@/lib/db/schema';
 
-const DEV_FALLBACK_SECRET = 'minimal-ade-local-dev-secret-replace-in-production-32chars';
+const DEV_FALLBACK_SECRET = 'web-ade-local-dev-secret-replace-in-production-32chars';
 
 function resolveAuthSecret(): string {
   const configured = process.env.BETTER_AUTH_SECRET?.trim() || process.env.AUTH_SECRET?.trim();
@@ -55,6 +55,8 @@ function resolveTrustedOrigins(): string[] {
   const candidates = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
+    'https://web-ade.com',
+    'https://www.web-ade.com',
     process.env.BETTER_AUTH_URL?.trim(),
     process.env.NEXT_PUBLIC_APP_URL?.trim(),
     process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL.trim()}` : undefined,
@@ -94,7 +96,7 @@ function createAuthInstance() {
 
   const plugins: BetterAuthPlugin[] = [
     anonymous({
-      emailDomainName: 'guest.minimal-ade.local',
+      emailDomainName: 'guest.web-ade.local',
       onLinkAccount: async ({ anonymousUser, newUser }) => {
         await transferUserOwnership(anonymousUser.user.id, newUser.user.id);
       },
@@ -119,7 +121,7 @@ function createAuthInstance() {
   plugins.push(nextCookies());
 
   return betterAuth({
-    appName: 'Minimal ADE',
+    appName: 'Web ADE',
     baseURL: resolveBaseURL(),
     secret: resolveAuthSecret(),
     trustedOrigins: resolveTrustedOrigins(),
@@ -157,15 +159,15 @@ function createAuthInstance() {
 export type AdeAuth = ReturnType<typeof createAuthInstance>;
 
 interface GlobalAuthCache {
-  __minimalAdeAuth?: AdeAuth;
+  __webAdeAuth?: AdeAuth;
 }
 
 const globalAuthCache = globalThis as unknown as GlobalAuthCache;
 
 /** Lazily constructs and caches the Better Auth instance. */
 export function getAuth(): AdeAuth {
-  if (!globalAuthCache.__minimalAdeAuth) {
-    globalAuthCache.__minimalAdeAuth = createAuthInstance();
+  if (!globalAuthCache.__webAdeAuth) {
+    globalAuthCache.__webAdeAuth = createAuthInstance();
   }
-  return globalAuthCache.__minimalAdeAuth;
+  return globalAuthCache.__webAdeAuth;
 }

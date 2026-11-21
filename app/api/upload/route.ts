@@ -48,16 +48,16 @@ const ALLOWED_MEDIA_TYPES = new Set([
 ]);
 
 interface GlobalUploadRateLimitState {
-  __minimalAdeUploadRateLimit?: Map<string, number[]>;
+  __webAdeUploadRateLimit?: Map<string, number[]>;
 }
 
 const rateLimitGlobal = globalThis as unknown as GlobalUploadRateLimitState;
 
 function getRateLimitMap(): Map<string, number[]> {
-  if (!rateLimitGlobal.__minimalAdeUploadRateLimit) {
-    rateLimitGlobal.__minimalAdeUploadRateLimit = new Map();
+  if (!rateLimitGlobal.__webAdeUploadRateLimit) {
+    rateLimitGlobal.__webAdeUploadRateLimit = new Map();
   }
-  return rateLimitGlobal.__minimalAdeUploadRateLimit;
+  return rateLimitGlobal.__webAdeUploadRateLimit;
 }
 
 function checkRateLimitBucket(

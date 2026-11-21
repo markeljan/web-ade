@@ -54,7 +54,7 @@ interface ResumableBusState {
 }
 
 const globalResumable = globalThis as typeof globalThis & {
-  __minimalAdeResumable?: ResumableBusState;
+  __webAdeResumable?: ResumableBusState;
 };
 
 function getOptionalResumableContext(): ResumableStreamContext | null {
@@ -64,17 +64,17 @@ function getOptionalResumableContext(): ResumableStreamContext | null {
     return null;
   }
 
-  if (!globalResumable.__minimalAdeResumable) {
-    globalResumable.__minimalAdeResumable = { listeners: new Map() };
+  if (!globalResumable.__webAdeResumable) {
+    globalResumable.__webAdeResumable = { listeners: new Map() };
   }
 
-  if (globalResumable.__minimalAdeResumable.context) {
-    return globalResumable.__minimalAdeResumable.context;
+  if (globalResumable.__webAdeResumable.context) {
+    return globalResumable.__webAdeResumable.context;
   }
 
   const redis = new Redis({ url, token });
-  const listeners = globalResumable.__minimalAdeResumable.listeners ?? new Map();
-  globalResumable.__minimalAdeResumable.listeners = listeners;
+  const listeners = globalResumable.__webAdeResumable.listeners ?? new Map();
+  globalResumable.__webAdeResumable.listeners = listeners;
 
   const publisher: Publisher = {
     connect: async () => undefined,
@@ -116,13 +116,13 @@ function getOptionalResumableContext(): ResumableStreamContext | null {
   };
 
   const context = createResumableStreamContext({
-    keyPrefix: 'minimal-ade:stream',
+    keyPrefix: 'web-ade:stream',
     waitUntil: after,
     publisher,
     subscriber,
   });
 
-  globalResumable.__minimalAdeResumable.context = context;
+  globalResumable.__webAdeResumable.context = context;
   return context;
 }
 

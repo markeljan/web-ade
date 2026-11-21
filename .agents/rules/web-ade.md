@@ -1,9 +1,9 @@
 ---
 trigger: always_on
-description: Core engineering, design system, AI SDK 7, billing waterfall, and security rules for minimal-ade.
+description: Core engineering, design system, AI SDK 7, billing waterfall, and security rules for web-ade.
 ---
 
-# minimal-ade Workspace Rules
+# web-ade Workspace Rules
 
 ## 1. Framework & SDK Compliance
 - **Next.js 16 + React 19 + Bun**: Use App Router Server Components by default; add `'use client'` only at interactive leaves. Never use `forwardRef` (pass `ref` as a regular prop in React 19).

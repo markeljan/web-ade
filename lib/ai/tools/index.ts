@@ -740,7 +740,7 @@ export async function createAdeTools(options: CreateAdeToolsOptions): Promise<To
           const { response, finalUrl } = await safeExternalFetch(url, {
             method: 'GET',
             headers: {
-              'User-Agent': 'MinimalADE/1.0 (+https://github.com/markeljan/minimal-ade)',
+              'User-Agent': 'WebADE/1.0 (+https://github.com/markeljan/web-ade)',
               Accept: 'text/html, text/plain, text/markdown, application/json;q=0.9',
             },
             maxRedirects: 5,
@@ -801,7 +801,7 @@ export async function createAdeTools(options: CreateAdeToolsOptions): Promise<To
   if (enableUiBridge) {
     coreTools.ui_snapshot = tool({
       description:
-        'Inspect the live Minimal ADE user interface state (theme, Astryx palette, model, harness, open Workbench tab, sidebar, and registered @ui-sdk/react/agent semantic controls). Executed client-side.',
+        'Inspect the live Web ADE user interface state (theme, Astryx palette, model, harness, open Workbench tab, sidebar, and registered @ui-sdk/react/agent semantic controls). Executed client-side.',
       inputSchema: z.object({
         includeComponents: z
           .boolean()
@@ -812,7 +812,7 @@ export async function createAdeTools(options: CreateAdeToolsOptions): Promise<To
 
     coreTools.ui_act = tool({
       description:
-        'Operate Minimal ADE UI controls directly via @ui-sdk/react/agent (switch theme/palette, open/switch Workbench tabs, change model/harness, navigate embedded browser, toggle sidebar, open settings/command palette). Respects Sentinel human-in-the-loop approval preference.',
+        'Operate Web ADE UI controls directly via @ui-sdk/react/agent (switch theme/palette, open/switch Workbench tabs, change model/harness, navigate embedded browser, toggle sidebar, open settings/command palette). Respects Sentinel human-in-the-loop approval preference.',
       inputSchema: z.object({
         reason: z
           .string()

@@ -6,8 +6,8 @@ import {
 } from '@ui-sdk/core';
 import type { AstryxPalette, ThemeMode } from '@/lib/types';
 
-export const ASTRYX_THEME_STORAGE_KEY = 'minimal-ade:color-scheme';
-export const ASTRYX_PALETTE_STORAGE_KEY = 'minimal-ade:astryx-palette';
+export const ASTRYX_THEME_STORAGE_KEY = 'web-ade:color-scheme';
+export const ASTRYX_PALETTE_STORAGE_KEY = 'web-ade:astryx-palette';
 
 export interface AstryxPaletteMeta {
   id: AstryxPalette;

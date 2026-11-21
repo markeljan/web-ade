@@ -664,7 +664,7 @@ export function Composer({
             onPaste={handlePaste}
             rows={1}
             placeholder={placeholder}
-            aria-label="Message Minimal ADE"
+            aria-label="Message Web ADE"
             className="block max-h-[220px] min-h-[48px] w-full resize-none bg-transparent px-4 pt-3.5 pb-2 text-sm leading-relaxed text-[var(--fg-primary)] placeholder:text-[var(--fg-muted)] outline-none"
           />
 
@@ -773,7 +773,7 @@ export function Composer({
               >
                 {!billingInfo.isUserBilled && billingInfo.source !== 'unconfigured' && (
                   <div className="mb-1 flex items-center justify-between gap-2 rounded-[var(--radius-inner)] bg-[var(--bg-surface-subtle)] px-2.5 py-1.5 text-[10px] text-[var(--fg-muted)]">
-                    <span>Sponsored: Haiku 5.5 &amp; GPT-6 Luna only</span>
+                    <span>Sponsored: GPT-6 Luna &amp; Haiku 5.5 only</span>
                     <button
                       type="button"
                       onClick={onOpenSettings}

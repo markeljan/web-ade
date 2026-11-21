@@ -128,7 +128,7 @@ export function SettingsDialog({
   const mcpSnippet = JSON.stringify(
     {
       mcpServers: {
-        'minimal-ade': {
+        'web-ade': {
           url: mcpUrl,
         },
       },
@@ -449,10 +449,10 @@ export function SettingsDialog({
                   {byokKind && <Badge variant="accent">{byokKind}</Badge>}
                 </div>
                 <p className="text-[11px] text-[var(--fg-muted)]">
-                  Sponsored mode includes <strong>Claude Haiku 5.5</strong> and{' '}
-                  <strong>GPT-6 Luna</strong>. Paste your own Vercel AI Gateway key (
-                  <code>vck_*</code>) or OpenAI key (<code>sk-*</code>) to unlock all Anthropic
-                  &amp; OpenAI models (Sonnet 5.5, Opus 5.5, GPT-6.2 Sol/Astra, GPT-5.3 Codex).
+                  Sponsored mode includes <strong>GPT-6 Luna</strong> (default) and{' '}
+                  <strong>Claude Haiku 5.5</strong>. Paste your own Vercel AI Gateway key (
+                  <code>vck_*</code>) or OpenAI key (<code>sk-*</code>) to unlock all OpenAI &amp;
+                  Anthropic models (GPT-6.2 Sol/Astra, GPT-5.3 Codex, Claude Sonnet/Opus 5.5).
                 </p>
                 <div className="relative">
                   <Input

@@ -96,7 +96,7 @@ const DEFAULT_GATEWAY_REALTIME_MODEL = gateway.experimental_realtime(REALTIME_MO
 
 const REALTIME_SESSION_CONFIG = {
   instructions:
-    'You are Minimal ADE, a calm, concise voice coding and engineering partner. Keep answers brief, structured, and helpful.',
+    'You are Web ADE, a calm, concise voice coding and engineering partner. Keep answers brief, structured, and helpful.',
 };
 
 export function VoiceModal({
@@ -680,7 +680,7 @@ export function VoiceModal({
                   )}
                 >
                   <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                    {entry.role === 'user' ? 'You' : 'Minimal ADE'}
+                    {entry.role === 'user' ? 'You' : 'Web ADE'}
                   </span>
                   <div
                     className={cn(

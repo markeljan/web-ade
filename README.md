@@ -1,7 +1,7 @@
 <div align="center">
-  <img src="./app/icon.svg" alt="minimal-ade logo" width="72" height="72" />
-  <h1>minimal-ade</h1>
-  <p><strong>Open-Source Web Agent Development Environment</strong></p>
+  <img src="./app/icon.svg" alt="Web ADE logo" width="72" height="72" />
+  <h1>Web ADE</h1>
+  <p><strong>Open-Source Web Agent Development Environment · <a href="https://web-ade.com">web-ade.com</a></strong></p>
   <p>
     Serene, content-first AI chat paired with an on-demand progressive Workbench — live browser &amp; desktop streaming,
     in-browser WASM &amp; cloud sandbox terminal, code &amp; artifact editor, guardrailed generative UI, trace waterfall,
@@ -9,7 +9,7 @@
   </p>
 
   <p>
-    <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmarkeljan%2Fminimal-ade&project-name=minimal-ade&repository-name=minimal-ade&stores=%5B%7B%22type%22%3A%22integration%22%2C%22integrationSlug%22%3A%22neon%22%2C%22productSlug%22%3A%22database%22%2C%22protocol%22%3A%22storage%22%7D%2C%7B%22type%22%3A%22blob%22%2C%22access%22%3A%22public%22%7D%5D&env=BETTER_AUTH_SECRET&envDescription=BETTER_AUTH_SECRET%20signs%20Better%20Auth%20sessions%20%E2%80%94%20use%20at%20least%2032%20random%20chars.%20AI%20models%20work%20zero-config%20via%20Vercel%20Project%20OIDC%20AI%20Gateway%20billing%3B%20optionally%20add%20OPENAI_API_KEY%2C%20AI_GATEWAY_API_KEY%2C%20or%20VERCEL_CLIENT_ID%20and%20VERCEL_CLIENT_SECRET%20after%20deploy.&envLink=https%3A%2F%2Fgithub.com%2Fmarkeljan%2Fminimal-ade%23environment-variables">
+    <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fmarkeljan%2Fweb-ade&project-name=web-ade&repository-name=web-ade&stores=%5B%7B%22type%22%3A%22integration%22%2C%22integrationSlug%22%3A%22neon%22%2C%22productSlug%22%3A%22database%22%2C%22protocol%22%3A%22storage%22%7D%2C%7B%22type%22%3A%22blob%22%2C%22access%22%3A%22public%22%7D%5D&env=BETTER_AUTH_SECRET&envDescription=BETTER_AUTH_SECRET%20signs%20Better%20Auth%20sessions%20%E2%80%94%20use%20at%20least%2032%20random%20chars.%20AI%20models%20work%20zero-config%20via%20Vercel%20Project%20OIDC%20AI%20Gateway%20billing%3B%20optionally%20add%20OPENAI_API_KEY%2C%20AI_GATEWAY_API_KEY%2C%20or%20VERCEL_CLIENT_ID%20and%20VERCEL_CLIENT_SECRET%20after%20deploy.&envLink=https%3A%2F%2Fgithub.com%2Fmarkeljan%2Fweb-ade%23environment-variables">
       <img src="https://vercel.com/button" alt="Deploy with Vercel" />
     </a>
   </p>
@@ -25,9 +25,9 @@
 
 ---
 
-## Why `minimal-ade`?
+## Why `Web ADE`?
 
-Most web AI templates are either minimal text-only chatbots or cluttered browser IDEs. **`minimal-ade`** starts as a calm, **Astryx-styled** chat canvas and progressively reveals a resizable **Workbench** only when your workflow calls for it:
+Most web AI templates are either minimal text-only chatbots or cluttered browser IDEs. **Web ADE** ([web-ade.com](https://web-ade.com)) starts as a calm, **Astryx-styled** chat canvas and progressively reveals a resizable **Workbench** only when your workflow calls for it:
 
 - **Preview / Live Browser & Desktop**: Instant `<iframe>` preview, 60fps `screen-relay` WebCodecs H.264 desktop streaming with one-click **Take Control / Hand Back**, `agent-browser` live JPEG pair-browsing, and universal SSRF-guarded HTTP snapshot fallback.
 - **Instant WASM + Cloud VM Terminal**: `@wterm/react` + `@wterm/just-bash` runs immediately in the browser with zero setup and upgrades seamlessly to persistent `@vercel/sandbox` Ubuntu microVMs.
@@ -40,7 +40,7 @@ Most web AI templates are either minimal text-only chatbots or cluttered browser
 
 ## One-Click Deploy with Vercel
 
-Click **Deploy with Vercel** above to clone `https://github.com/markeljan/minimal-ade` with:
+Click **Deploy with Vercel** above to clone `https://github.com/markeljan/web-ade` with:
 
 1. **Neon Postgres** auto-provisioned via Vercel Marketplace (`neon` / `database` storage integration) → sets `DATABASE_URL`.
 2. **Vercel Blob** (`public` store) auto-provisioned → sets `BLOB_READ_WRITE_TOKEN` for multimodal attachments & generated images.
@@ -53,7 +53,7 @@ After your first deploy, run `bun run db:push` (or connect locally via `vercel e
 
 ## Feature Showcase (Vercel & Vercel Labs Stack)
 
-| Capability | Packages (Verified Versions) | What It Powers in `minimal-ade` |
+| Capability | Packages (Verified Versions) | What It Powers in Web ADE |
 |---|---|---|
 | **AI SDK 7 Core & Streaming** | `ai@7.0.177`, `@ai-sdk/react@4.0.181`, `@ai-sdk/gateway@4.0.150`, `@ai-sdk/openai@4.0.121`, `@ai-sdk/openai-compatible@3.0.93`, `resumable-stream@2.2.13` | `streamText`, `createUIMessageStream`, `isStepCount(12)`, Zod v4 `tool({ inputSchema, needsApproval })`, unified `{ type: 'file', data, mediaType }` multimodal parts, Sentinel tool approvals (`addToolApprovalResponse`), inline `ask_user` cards, message branching, and optional Upstash Redis resumable streams. |
 | **Headless Chrome & UI Agent Bridge** | `@ui-sdk/react@0.1.0-beta.13`, `@ui-sdk/core@0.1.0-beta.13` | Resizable Chat ↔ Workbench split (`./resizable`), `⌘K` Command Palette (`./command`), workspace File Tree (`./tree`), `/` & `@` composer Trigger Menu (`./trigger-menu`), latency Trace Waterfall (`./waterfall`), zero-flash theme persistence (`./preferences`), and **`createAgent()` Self-Operating UI Bridge** (`./agent`) with human approval & optional WebMCP. |
@@ -64,10 +64,10 @@ After your first deploy, run `bun run db:push` (or connect locally via `vercel e
 | **Workflow 5 `WorkflowAgent` Harness** | `workflow@5.7.0`, `@ai-sdk/workflow@2.0.109`, `@opentelemetry/api@1.10.0` | Selectable `workflow` harness mode (`lib/workflows/agent-workflow.ts`) using `"use workflow"` + `"use step"` directives, `withWorkflow` in `next.config.ts`, and reconnectable streams at `/api/workflow` & `/api/workflow/[runId]`. |
 | **Web Terminal & Dual-Tier Sandbox** | `@wterm/react@0.6.0`, `@wterm/just-bash@0.6.0`, `just-bash@3.6.1`, `bash-tool@1.3.19`, `@vercel/sandbox@4.0.0`, `codemirror@6.0.2` | Instant browser WASM shell (`@wterm/just-bash` + `webmcp={{ name: 'shell' }}`) paired with `just-bash` `InMemoryFs` + `bash-tool` — seamlessly upgrading to persistent `@vercel/sandbox` Ubuntu microVMs exposing ports `3000`, `4848`, and `8080`, plus CodeMirror 6 file & versioned artifact editing. |
 | **Live Browser & Desktop Streaming** | `screen-relay@0.1.2`, `@agent-browser/sandbox@0.43.0`, `remote-agent-browser@1.3.0` | Unified 4-mode `<BrowserPane />`: **Mode A** `<iframe>` App Preview, **Mode B** 60fps `screen-relay` `NSL1` WebCodecs H.264 stream with server-minted short-lived `/tickets` + `ticket.<TOKEN>` WebSocket handshake (`/api/sandbox/relay-grant`, `/stream` vs `/stream?view=1`) & single-owner **Take Control / Hand Back**, **Mode C** `agent-browser` WS JPEG pair-browsing (`@eN` refs), and **Mode D** universal DNS/SSRF-guarded HTTP snapshot (`agent-desktop` pre-baked in optional Sandbox snapshot). |
-| **Voice (STT / TTS / Realtime) & Multimodal** | `ai@7.0.177`, `@ai-sdk/react@4.0.181`, `@vercel/blob@2.9.0` | 3-tier voice stack — STT (`/api/voice/transcribe`), TTS (`/api/voice/speak`), and Live Realtime Voice (`/api/realtime/token` + `experimental_useRealtime` with Web Speech API fallback) — plus image generation (`google/gemini-3.1-flash-image` / `openai/gpt-image-2`) and Vercel Blob uploads (base64 fallback locally). |
+| **Voice (STT / TTS / Realtime) & Multimodal** | `ai@7.0.177`, `@ai-sdk/react@4.0.181`, `@vercel/blob@2.9.0` | 3-tier voice stack — STT (`/api/voice/transcribe`), TTS (`/api/voice/speak`), and Live Realtime Voice (`/api/realtime/token` + `experimental_useRealtime` with Web Speech API fallback) — plus OpenAI image generation (`openai/gpt-image-2`) and Vercel Blob uploads (base64 fallback locally). |
 | **GitHub Engineering Tools** | `@github-tools/sdk@1.24.0` | Optional GitHub tool pack (`repo-explorer` preset) activated dynamically when a user supplies a personal GitHub token in Settings — explore repositories, inspect issues/PRs, and review diffs directly from chat. |
 | **Remote MCP Server (`/api/mcp`)** | `mcp-handler@2.4.0`, `@modelcontextprotocol/server@2.4.0` | Stateless Streamable HTTP MCP server (optionally secured by `ADE_MCP_TOKEN` Bearer auth) exposing `workspace_list_files`, `workspace_read_file`, `workspace_write_file`, `workspace_bash`, and `browser_open_and_snapshot` so external agents (Claude Code, Cursor, `fx`) can drive ADE workspaces. |
-| **Database, Auth & Observability** | `drizzle-orm@0.45.4`, `@neondatabase/serverless@1.2.1`, `better-auth@1.7.26`, `@vercel/connect@2.9.5`, `@vercel/functions@3.11.3` | Neon Postgres via Drizzle with automatic local JSON fallback (`.minimal-ade-data/store.json`), **Sign in with Vercel OAuth + Instant Guest Sessions + BYOK** (with automatic ownership transfer on sign-in), optional Vercel Connect, and low-cardinality `@vercel/functions` metrics. |
+| **Database, Auth & Observability** | `drizzle-orm@0.45.4`, `@neondatabase/serverless@1.2.1`, `better-auth@1.7.26`, `@vercel/connect@2.9.5`, `@vercel/functions@3.11.3` | Neon Postgres via Drizzle with automatic local JSON fallback (`.web-ade-data/store.json`), **Sign in with Vercel OAuth + Instant Guest Sessions + BYOK** (with automatic ownership transfer on sign-in), optional Vercel Connect, and low-cardinality `@vercel/functions` metrics. |
 
 ---
 
@@ -95,15 +95,15 @@ flowchart TD
 | **1** | **Custom OpenAI-Compatible Endpoint** | UI Settings override or `OPENAI_COMPATIBLE_BASE_URL` (+ optional `OPENAI_COMPATIBLE_API_KEY` & `OPENAI_COMPATIBLE_MODEL`) via `@ai-sdk/openai-compatible` (Ollama, vLLM, LM Studio, OpenRouter). | `Custom Endpoint` |
 | **2a** | **User BYOK Key** | Key entered in **Settings → Providers** (`vck_*` → `createGateway`, `sk-*` → `createOpenAI`). Stored locally in browser preferences and sent only per-request over HTTPS. | `Your API Key` |
 | **2b** | **Sign in with Vercel OAuth (`vca_*`)** | Signed-in user's Vercel OAuth access token (1h TTL, auto-refreshed via 30d `refresh_token`). Verified via `GET https://ai-gateway.vercel.sh/v1/credits` (60s SHA-256-hashed cache). Automatically falls back to Tier 3+ if credits are `0` or on HTTP `401`/`402`/`403`. | `Your Vercel Credits` |
-| **3** | **Host Sponsor `OPENAI_API_KEY` (First)** | Prioritized ahead of `AI_GATEWAY_API_KEY`. Strips `openai/` prefixes for direct OpenAI API routing; routes non-OpenAI models to AI Gateway if Tier 4/5 credentials exist, or gracefully maps to a matching OpenAI tier (`gpt-6.2-sol`, `gpt-6-luna`, `gpt-5.3-codex`). | `Demo Sponsored (OpenAI)` |
-| **4** | **Host Sponsor `AI_GATEWAY_API_KEY`** | Direct Vercel AI Gateway access across all 13 curated frontier models (Anthropic Claude 5.5, OpenAI GPT-6.2/5.3 Codex, Google Gemini 4 Carbon/Argon & 3.8 Flash, SpaceXAI Grok 4.7/4.20). | `Demo Sponsored (Gateway)` |
-| **5** | **Vercel Project OIDC (`VERCEL_OIDC_TOKEN`)** | Automatic zero-config default on Vercel deployments — bills the deployer's own Vercel AI Gateway credits without managing static keys. | `Vercel Project OIDC` |
+| **3** | **Host Sponsor `OPENAI_API_KEY` (First)** | Prioritized ahead of `AI_GATEWAY_API_KEY`. Sponsored mode is limited to **`openai/gpt-6-luna`** (default) and **`anthropic/claude-haiku-5.5`** until a user supplies their own key. | `Demo Sponsored (OpenAI)` |
+| **4** | **Host Sponsor `AI_GATEWAY_API_KEY`** | Sponsored Vercel AI Gateway access limited to **`openai/gpt-6-luna`** (default) and **`anthropic/claude-haiku-5.5`**. Adding your own BYOK key unlocks all curated OpenAI & Anthropic models (GPT-6.2 Sol/Astra, GPT-5.3 Codex, Claude Sonnet/Opus 5.5). | `Demo Sponsored (Gateway)` |
+| **5** | **Vercel Project OIDC (`VERCEL_OIDC_TOKEN`)** | Automatic zero-config default on Vercel deployments — bills the deployer's own Vercel AI Gateway credits (sponsored models: **`openai/gpt-6-luna`** default & **`anthropic/claude-haiku-5.5`**). | `Vercel Project OIDC` |
 
 ---
 
 ## Sign in with Vercel & Vercel Connect Setup Guide
 
-Minimal ADE authenticates users via **Sign in with Vercel OAuth + Instant Guest Sessions + BYOK** (zero friction on first visit via HMAC-signed anonymous guest sessions, with optional BYOK keys in Settings). Follow these steps to enable **Sign in with Vercel** so signed-in users can automatically bill usage to their own Vercel AI Gateway credits (Tier 2b):
+Web ADE authenticates users via **Sign in with Vercel OAuth + Instant Guest Sessions + BYOK** (zero friction on first visit via HMAC-signed anonymous guest sessions, with optional BYOK keys in Settings). Follow these steps to enable **Sign in with Vercel** so signed-in users can automatically bill usage to their own Vercel AI Gateway credits (Tier 2b):
 
 ### 1. Create a Vercel OAuth App
 1. Open your Vercel Team Dashboard:
@@ -126,7 +126,7 @@ Minimal ADE authenticates users via **Sign in with Vercel OAuth + Instant Guest 
    ```
 
 ### 2. Automatic Sponsor Fallback
-If a user signs in without `AI Gateway: Use` enabled on your Vercel App, has `$0` remaining credits, or encounters an upstream `401`/`402`/`403` billing response from AI Gateway, Minimal ADE automatically invalidates the cached credit result and transparently retries on **Tier 3–5** (host sponsor / project OIDC) without failing the conversation. When an anonymous guest signs in, their existing chats, artifacts, and workspace files are automatically transferred to their authenticated account.
+If a user signs in without `AI Gateway: Use` enabled on your Vercel App, has `$0` remaining credits, or encounters an upstream `401`/`402`/`403` billing response from AI Gateway, Web ADE automatically invalidates the cached credit result and transparently retries on **Tier 3–5** (host sponsor / project OIDC) without failing the conversation. When an anonymous guest signs in, their existing chats, artifacts, and workspace files are automatically transferred to their authenticated account.
 
 ### 3. Optional: Vercel Connect (`@vercel/connect/betterauth`)
 If you prefer OIDC-backed connector token exchange without static client secrets:
@@ -145,8 +145,8 @@ If you prefer OIDC-backed connector token exchange without static client secrets
 **Requirements**: [Bun](https://bun.sh) `1.4+` and Node.js `>=22.12.0`.
 
 ```bash
-git clone https://github.com/markeljan/minimal-ade.git
-cd minimal-ade
+git clone https://github.com/markeljan/web-ade.git
+cd web-ade
 bun install
 cp .env.example .env.local
 bun dev
@@ -155,7 +155,7 @@ bun dev
 Open [http://localhost:3000](http://localhost:3000).
 
 - **Works immediately without Postgres, Blob, Redis, or Vercel Sandbox**:
-  - Persistence automatically falls back to an atomic local JSON store (`.minimal-ade-data/store.json`).
+  - Persistence automatically falls back to an atomic local JSON store (`.web-ade-data/store.json`).
   - Uploads fall back to inline base64 data URLs.
   - The workspace shell & `@wterm/react` terminal run immediately via in-browser `just-bash` WASM (`InMemoryFs`).
 - **Configure a model provider** via either:
@@ -187,7 +187,7 @@ This creates the 9 tables defined in `lib/db/schema.ts`: Better Auth tables (`us
 
 ### Pre-Baking a `@vercel/sandbox` Snapshot (`<1s` Boot)
 
-Tier 1 (`just-bash`) runs instantly everywhere. When `VERCEL_OIDC_TOKEN` (or `VERCEL_TOKEN`) is present, Minimal ADE can upgrade any workspace to a real Tier 2 Ubuntu `@vercel/sandbox` microVM exposing ports `3000` (app preview), `4848` (`agent-browser` dashboard), and `8080` (`screen-relay`).
+Tier 1 (`just-bash`) runs instantly everywhere. When `VERCEL_OIDC_TOKEN` (or `VERCEL_TOKEN`) is present, Web ADE can upgrade any workspace to a real Tier 2 Ubuntu `@vercel/sandbox` microVM exposing ports `3000` (app preview), `4848` (`agent-browser` dashboard), and `8080` (`screen-relay`).
 
 Pre-bake a reusable snapshot so browser and full-desktop sandboxes boot in `<1s` instead of installing packages at runtime:
 
@@ -213,7 +213,7 @@ See [`.env.example`](./.env.example) for the complete annotated template.
 | Variable | Required? | Purpose |
 |---|---|---|
 | `BETTER_AUTH_SECRET` | **Production** | Min 32-char secret for Better Auth session & guest cookie signing (`openssl rand -base64 32`). |
-| `DATABASE_URL` | Optional *(Neon)* | Neon Postgres connection string. Falls back to `.minimal-ade-data/store.json` locally when unset. |
+| `DATABASE_URL` | Optional *(Neon)* | Neon Postgres connection string. Falls back to `.web-ade-data/store.json` locally when unset. |
 | `BLOB_READ_WRITE_TOKEN` | Optional *(Blob)* | Vercel Blob token for file/image uploads. Falls back to base64 data URLs locally. |
 | `BETTER_AUTH_URL` / `NEXT_PUBLIC_APP_URL` | Optional | Public origin URL for OAuth callbacks & WS origin checks (auto-detected on Vercel; defaults to `http://localhost:3000`). |
 | `OPENAI_API_KEY` | Optional *(Tier 3)* | Host sponsor direct OpenAI key — prioritized ahead of `AI_GATEWAY_API_KEY`. |
@@ -231,7 +231,7 @@ See [`.env.example`](./.env.example) for the complete annotated template.
 ## Architecture & Remote MCP
 
 ```text
-minimal-ade/
+web-ade/
 ├── app/
 │   ├── api/
 │   │   ├── chat/                 # AI SDK 7 streaming (/api/chat), resumable stream, fx harness (/api/chat/fx)
@@ -252,7 +252,7 @@ minimal-ade/
 │   ├── ui/                       # Base UI (@base-ui/react) React 19 primitives
 │   └── workbench/                # Resizable Workbench: BrowserPane (4 modes), TerminalPane (@wterm), Files, GenUI, Trace
 ├── lib/
-│   ├── ai/                       # 5-tier provider waterfall, 13-model catalog, credits checker, GenUI catalog, 19 ADE tools
+│   ├── ai/                       # 5-tier provider waterfall, OpenAI + Anthropic catalog, credits checker, GenUI catalog, 19 ADE tools
 │   ├── auth/ & db/               # Better Auth + Sign in with Vercel, Drizzle Neon schema + local JSON fallback
 │   ├── harnesses/ & workflows/   # libfx durable harness & Workflow 5 WorkflowAgent
 │   ├── sandbox/                  # just-bash ↔ @vercel/sandbox manager & 4-mode browser/screen-relay service
@@ -264,12 +264,12 @@ minimal-ade/
 
 ### Connecting External Agents to `/api/mcp`
 
-Any MCP-compatible client (Claude Code, Cursor, `fx`, etc.) can connect to your running Minimal ADE workspace over Streamable HTTP:
+Any MCP-compatible client (Claude Code, Cursor, `fx`, etc.) can connect to your running Web ADE workspace over Streamable HTTP:
 
 ```json
 {
   "mcpServers": {
-    "minimal-ade": {
+    "web-ade": {
       "url": "http://localhost:3000/api/mcp",
       "headers": {
         "Authorization": "Bearer <ADE_MCP_TOKEN>"
@@ -308,7 +308,7 @@ Exposed tools: `workspace_list_files`, `workspace_read_file`, `workspace_write_f
 This repository ships first-class agent instructions, workspace rules, and architectural skills so AI coding agents stay 100% aligned with AI SDK 7, the 5-tier billing waterfall, Astryx tokens, and security invariants:
 
 - **[`AGENTS.md`](./AGENTS.md)** — Engineering handbook, non-negotiable SDK rules, billing waterfall order, security invariants, and verification commands.
-- **[`.agents/rules/minimal-ade.md`](./.agents/rules/minimal-ade.md)** — Always-on workspace rules enforced on every edit.
+- **[`.agents/rules/web-ade.md`](./.agents/rules/web-ade.md)** — Always-on workspace rules enforced on every edit.
 - **[`.agents/skills/ade-architecture/SKILL.md`](./.agents/skills/ade-architecture/SKILL.md)** — Deep architectural reference and implementation runbook covering every subsystem.
 
 ---

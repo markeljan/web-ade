@@ -32,11 +32,11 @@ import {
 } from '@/lib/db/queries';
 
 interface GlobalLocalStoreState {
-  __minimalAdeLocalStore?: LocalStoreData;
-  __minimalAdeLocalStoreLoaded?: boolean;
-  __minimalAdeLocalStorePath?: string;
-  __minimalAdeLocalStoreReadOnly?: boolean;
-  __minimalAdeLocalStoreQueue?: Promise<unknown>;
+  __webAdeLocalStore?: LocalStoreData;
+  __webAdeLocalStoreLoaded?: boolean;
+  __webAdeLocalStorePath?: string;
+  __webAdeLocalStoreReadOnly?: boolean;
+  __webAdeLocalStoreQueue?: Promise<unknown>;
 }
 
 const globalState = globalThis as unknown as GlobalLocalStoreState;
@@ -52,37 +52,37 @@ describe('local fallback store (zero-DB CRUD, branching, artifacts, workspace sy
     delete process.env.DATABASE_URL;
 
     savedGlobalStore = {
-      __minimalAdeLocalStore: globalState.__minimalAdeLocalStore,
-      __minimalAdeLocalStoreLoaded: globalState.__minimalAdeLocalStoreLoaded,
-      __minimalAdeLocalStorePath: globalState.__minimalAdeLocalStorePath,
-      __minimalAdeLocalStoreReadOnly: globalState.__minimalAdeLocalStoreReadOnly,
-      __minimalAdeLocalStoreQueue: globalState.__minimalAdeLocalStoreQueue,
+      __webAdeLocalStore: globalState.__webAdeLocalStore,
+      __webAdeLocalStoreLoaded: globalState.__webAdeLocalStoreLoaded,
+      __webAdeLocalStorePath: globalState.__webAdeLocalStorePath,
+      __webAdeLocalStoreReadOnly: globalState.__webAdeLocalStoreReadOnly,
+      __webAdeLocalStoreQueue: globalState.__webAdeLocalStoreQueue,
     };
 
-    tempDir = await mkdtemp(path.join(os.tmpdir(), 'minimal-ade-local-store-'));
+    tempDir = await mkdtemp(path.join(os.tmpdir(), 'web-ade-local-store-'));
     tempStorePath = path.join(tempDir, 'store.json');
 
-    globalState.__minimalAdeLocalStore = {
+    globalState.__webAdeLocalStore = {
       chats: {},
       messages: {},
       votes: {},
       artifacts: {},
       workspaceFiles: {},
     };
-    globalState.__minimalAdeLocalStoreLoaded = true;
-    globalState.__minimalAdeLocalStorePath = tempStorePath;
-    globalState.__minimalAdeLocalStoreReadOnly = false;
-    globalState.__minimalAdeLocalStoreQueue = undefined;
+    globalState.__webAdeLocalStoreLoaded = true;
+    globalState.__webAdeLocalStorePath = tempStorePath;
+    globalState.__webAdeLocalStoreReadOnly = false;
+    globalState.__webAdeLocalStoreQueue = undefined;
   });
 
   afterEach(async () => {
-    await globalState.__minimalAdeLocalStoreQueue?.catch(() => undefined);
+    await globalState.__webAdeLocalStoreQueue?.catch(() => undefined);
 
-    globalState.__minimalAdeLocalStore = savedGlobalStore.__minimalAdeLocalStore;
-    globalState.__minimalAdeLocalStoreLoaded = savedGlobalStore.__minimalAdeLocalStoreLoaded;
-    globalState.__minimalAdeLocalStorePath = savedGlobalStore.__minimalAdeLocalStorePath;
-    globalState.__minimalAdeLocalStoreReadOnly = savedGlobalStore.__minimalAdeLocalStoreReadOnly;
-    globalState.__minimalAdeLocalStoreQueue = savedGlobalStore.__minimalAdeLocalStoreQueue;
+    globalState.__webAdeLocalStore = savedGlobalStore.__webAdeLocalStore;
+    globalState.__webAdeLocalStoreLoaded = savedGlobalStore.__webAdeLocalStoreLoaded;
+    globalState.__webAdeLocalStorePath = savedGlobalStore.__webAdeLocalStorePath;
+    globalState.__webAdeLocalStoreReadOnly = savedGlobalStore.__webAdeLocalStoreReadOnly;
+    globalState.__webAdeLocalStoreQueue = savedGlobalStore.__webAdeLocalStoreQueue;
 
     if (savedDatabaseUrl === undefined) {
       delete process.env.DATABASE_URL;

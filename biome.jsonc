@@ -15,7 +15,7 @@
       "!coverage",
       "!playwright-report",
       "!test-results",
-      "!.minimal-ade-data",
+      "!.web-ade-data",
       "!.agents",
       "!**/*.md",
       "!lib/db/migrations"

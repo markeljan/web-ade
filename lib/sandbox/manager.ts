@@ -16,7 +16,7 @@ export const WORKSPACE_ROOT = '/workspace';
 export const CLOUD_WORKSPACE_ROOT = '/vercel/sandbox';
 
 export const STARTER_WORKSPACE_FILES: Record<string, string> = {
-  'README.md': `# Minimal ADE Workspace
+  'README.md': `# Web ADE Workspace
 
 Welcome to your dual-tier agent workspace.
 
@@ -34,7 +34,7 @@ Welcome to your dual-tier agent workspace.
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Minimal ADE · Live Workspace Preview</title>
+    <title>Web ADE · Live Workspace Preview</title>
     <style>
       :root {
         color-scheme: light dark;
@@ -121,7 +121,7 @@ Welcome to your dual-tier agent workspace.
   <body>
     <main class="card">
       <span class="pill"><span class="dot"></span>Live Workspace Preview</span>
-      <h1>Minimal ADE Sandbox Ready</h1>
+      <h1>Web ADE Sandbox Ready</h1>
       <p>
         Edit <code>index.html</code> from the Files editor, terminal, or chat agent to see
         instant updates right here.
@@ -148,7 +148,7 @@ Welcome to your dual-tier agent workspace.
 }
 
 export function formatGreeting({ name, tier = 'just-bash' }: GreetingOptions): string {
-  return \`Hello, \${name}! Running on Minimal ADE (\${tier}).\`;
+  return \`Hello, \${name}! Running on Web ADE (\${tier}).\`;
 }
 
 if (typeof process !== 'undefined' && process.argv[1]?.endsWith('hello.ts')) {
@@ -365,39 +365,39 @@ export async function authorizeSandboxChatAccess(
 
 // Persist in-memory workspace state and active cloud handles across Next.js dev HMR reloads.
 const globalSandboxState = globalThis as typeof globalThis & {
-  __minimalAdeWorkspaceStore?: Map<string, Map<string, string>>;
-  __minimalAdeInitializedWorkspaces?: Set<string>;
-  __minimalAdeCloudSandboxes?: Map<string, ActiveCloudSandbox>;
-  __minimalAdePreferredTier?: Map<string, SandboxTier>;
-  __minimalAdeDbAdapter?: WorkspacePersistenceAdapter | null;
+  __webAdeWorkspaceStore?: Map<string, Map<string, string>>;
+  __webAdeInitializedWorkspaces?: Set<string>;
+  __webAdeCloudSandboxes?: Map<string, ActiveCloudSandbox>;
+  __webAdePreferredTier?: Map<string, SandboxTier>;
+  __webAdeDbAdapter?: WorkspacePersistenceAdapter | null;
 };
 
 function getMemoryStore(): Map<string, Map<string, string>> {
-  if (!globalSandboxState.__minimalAdeWorkspaceStore) {
-    globalSandboxState.__minimalAdeWorkspaceStore = new Map();
+  if (!globalSandboxState.__webAdeWorkspaceStore) {
+    globalSandboxState.__webAdeWorkspaceStore = new Map();
   }
-  return globalSandboxState.__minimalAdeWorkspaceStore;
+  return globalSandboxState.__webAdeWorkspaceStore;
 }
 
 function getInitializedWorkspaces(): Set<string> {
-  if (!globalSandboxState.__minimalAdeInitializedWorkspaces) {
-    globalSandboxState.__minimalAdeInitializedWorkspaces = new Set();
+  if (!globalSandboxState.__webAdeInitializedWorkspaces) {
+    globalSandboxState.__webAdeInitializedWorkspaces = new Set();
   }
-  return globalSandboxState.__minimalAdeInitializedWorkspaces;
+  return globalSandboxState.__webAdeInitializedWorkspaces;
 }
 
 function getCloudRegistry(): Map<string, ActiveCloudSandbox> {
-  if (!globalSandboxState.__minimalAdeCloudSandboxes) {
-    globalSandboxState.__minimalAdeCloudSandboxes = new Map();
+  if (!globalSandboxState.__webAdeCloudSandboxes) {
+    globalSandboxState.__webAdeCloudSandboxes = new Map();
   }
-  return globalSandboxState.__minimalAdeCloudSandboxes;
+  return globalSandboxState.__webAdeCloudSandboxes;
 }
 
 function getPreferredTierRegistry(): Map<string, SandboxTier> {
-  if (!globalSandboxState.__minimalAdePreferredTier) {
-    globalSandboxState.__minimalAdePreferredTier = new Map();
+  if (!globalSandboxState.__webAdePreferredTier) {
+    globalSandboxState.__webAdePreferredTier = new Map();
   }
-  return globalSandboxState.__minimalAdePreferredTier;
+  return globalSandboxState.__webAdePreferredTier;
 }
 
 const defaultDbAdapter: WorkspacePersistenceAdapter = {
@@ -411,12 +411,12 @@ const defaultDbAdapter: WorkspacePersistenceAdapter = {
  * Optional registration hook for overriding persistence in tests.
  */
 export function registerWorkspacePersistence(adapter: WorkspacePersistenceAdapter | null): void {
-  globalSandboxState.__minimalAdeDbAdapter = adapter;
+  globalSandboxState.__webAdeDbAdapter = adapter;
 }
 
 async function resolveDbAdapter(): Promise<WorkspacePersistenceAdapter | null> {
-  if (globalSandboxState.__minimalAdeDbAdapter !== undefined) {
-    return globalSandboxState.__minimalAdeDbAdapter;
+  if (globalSandboxState.__webAdeDbAdapter !== undefined) {
+    return globalSandboxState.__webAdeDbAdapter;
   }
   return defaultDbAdapter;
 }

@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og';
 
-export const alt = 'minimal-ade — Open-Source Web Agent Development Environment';
+export const alt = 'Web ADE — Open-Source Web Agent Development Environment';
 
 export const size = {
   width: 1200,
@@ -110,7 +110,7 @@ export default function OpenGraphImage() {
                   color: '#F2F4F6',
                 }}
               >
-                minimal-ade
+                Web ADE
               </span>
               <span
                 style={{
@@ -119,7 +119,7 @@ export default function OpenGraphImage() {
                   letterSpacing: '0.04em',
                 }}
               >
-                ASTRYX DESIGN SYSTEM · VERCEL LABS
+                WEB-ADE.COM · ASTRYX · VERCEL LABS
               </span>
             </div>
           </div>
@@ -168,7 +168,7 @@ export default function OpenGraphImage() {
               color: '#F2F4F6',
             }}
           >
-            minimal-ade
+            Web ADE
           </div>
           <div
             style={{

@@ -28,11 +28,11 @@ import { createChat, saveMessages } from '@/lib/db/queries';
 import { registerWorkspacePersistence } from '@/lib/sandbox/manager';
 
 interface GlobalLocalStoreState {
-  __minimalAdeLocalStore?: LocalStoreData;
-  __minimalAdeLocalStoreLoaded?: boolean;
-  __minimalAdeLocalStorePath?: string;
-  __minimalAdeLocalStoreReadOnly?: boolean;
-  __minimalAdeLocalStoreQueue?: Promise<unknown>;
+  __webAdeLocalStore?: LocalStoreData;
+  __webAdeLocalStoreLoaded?: boolean;
+  __webAdeLocalStorePath?: string;
+  __webAdeLocalStoreReadOnly?: boolean;
+  __webAdeLocalStoreQueue?: Promise<unknown>;
 }
 
 const ENV_KEYS = [
@@ -73,38 +73,38 @@ describe('Next.js API route handler integration smoke tests', () => {
     }
 
     savedGlobalStore = {
-      __minimalAdeLocalStore: globalState.__minimalAdeLocalStore,
-      __minimalAdeLocalStoreLoaded: globalState.__minimalAdeLocalStoreLoaded,
-      __minimalAdeLocalStorePath: globalState.__minimalAdeLocalStorePath,
-      __minimalAdeLocalStoreReadOnly: globalState.__minimalAdeLocalStoreReadOnly,
-      __minimalAdeLocalStoreQueue: globalState.__minimalAdeLocalStoreQueue,
+      __webAdeLocalStore: globalState.__webAdeLocalStore,
+      __webAdeLocalStoreLoaded: globalState.__webAdeLocalStoreLoaded,
+      __webAdeLocalStorePath: globalState.__webAdeLocalStorePath,
+      __webAdeLocalStoreReadOnly: globalState.__webAdeLocalStoreReadOnly,
+      __webAdeLocalStoreQueue: globalState.__webAdeLocalStoreQueue,
     };
 
-    tempDir = await mkdtemp(path.join(os.tmpdir(), 'minimal-ade-api-routes-'));
-    globalState.__minimalAdeLocalStore = {
+    tempDir = await mkdtemp(path.join(os.tmpdir(), 'web-ade-api-routes-'));
+    globalState.__webAdeLocalStore = {
       chats: {},
       messages: {},
       votes: {},
       artifacts: {},
       workspaceFiles: {},
     };
-    globalState.__minimalAdeLocalStoreLoaded = true;
-    globalState.__minimalAdeLocalStorePath = path.join(tempDir, 'store.json');
-    globalState.__minimalAdeLocalStoreReadOnly = false;
-    globalState.__minimalAdeLocalStoreQueue = undefined;
+    globalState.__webAdeLocalStoreLoaded = true;
+    globalState.__webAdeLocalStorePath = path.join(tempDir, 'store.json');
+    globalState.__webAdeLocalStoreReadOnly = false;
+    globalState.__webAdeLocalStoreQueue = undefined;
 
     registerWorkspacePersistence(null);
   });
 
   afterEach(async () => {
-    await globalState.__minimalAdeLocalStoreQueue?.catch(() => undefined);
+    await globalState.__webAdeLocalStoreQueue?.catch(() => undefined);
 
-    delete (globalThis as Record<string, unknown>).__minimalAdeDbAdapter;
-    globalState.__minimalAdeLocalStore = savedGlobalStore.__minimalAdeLocalStore;
-    globalState.__minimalAdeLocalStoreLoaded = savedGlobalStore.__minimalAdeLocalStoreLoaded;
-    globalState.__minimalAdeLocalStorePath = savedGlobalStore.__minimalAdeLocalStorePath;
-    globalState.__minimalAdeLocalStoreReadOnly = savedGlobalStore.__minimalAdeLocalStoreReadOnly;
-    globalState.__minimalAdeLocalStoreQueue = savedGlobalStore.__minimalAdeLocalStoreQueue;
+    delete (globalThis as Record<string, unknown>).__webAdeDbAdapter;
+    globalState.__webAdeLocalStore = savedGlobalStore.__webAdeLocalStore;
+    globalState.__webAdeLocalStoreLoaded = savedGlobalStore.__webAdeLocalStoreLoaded;
+    globalState.__webAdeLocalStorePath = savedGlobalStore.__webAdeLocalStorePath;
+    globalState.__webAdeLocalStoreReadOnly = savedGlobalStore.__webAdeLocalStoreReadOnly;
+    globalState.__webAdeLocalStoreQueue = savedGlobalStore.__webAdeLocalStoreQueue;
 
     for (const key of ENV_KEYS) {
       const prev = savedEnv[key];
@@ -137,8 +137,8 @@ describe('Next.js API route handler integration smoke tests', () => {
       true,
     );
     expect(getData.models.filter((m) => m.sponsoredEligible).map((m) => m.id)).toEqual([
-      'anthropic/claude-haiku-5.5',
       'openai/gpt-6-luna',
+      'anthropic/claude-haiku-5.5',
     ]);
     expect(getData.diagnostics.tiers.length).toBe(6);
 

@@ -522,7 +522,8 @@ describe('5-tier provider & billing waterfall', () => {
     expect(astraClamped.fallbackReason).toContain('Sponsored demo mode');
 
     const googleClamped = await resolveLanguageModel({ modelId: 'google/gemini-4-carbon' });
-    expect(googleClamped.modelId).toBe(FAST_MODEL_ID);
+    expect(googleClamped.modelId).toBe(FAST_OPENAI_MODEL_ID);
+    expect(resolved.modelId).toBe('openai/gpt-6-luna');
 
     // User BYOK key unlocks flagship Anthropic + OpenAI models immediately
     const byokUnlocked = await resolveLanguageModel({

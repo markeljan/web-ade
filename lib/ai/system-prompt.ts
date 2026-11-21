@@ -13,7 +13,7 @@ export interface BuildSystemPromptOptions {
 }
 
 /**
- * Constructs the high-craft system instructions for Minimal ADE.
+ * Constructs the high-craft system instructions for Web ADE.
  * Enforces progressive disclosure, guardrailed json-render GenUI,
  * fx0-style instant single-file HTML previews, sandbox coding, live browsing,
  * and @ui-sdk/react/agent self-operating UI controls.
@@ -31,7 +31,7 @@ export function buildAdeSystemPrompt(options: BuildSystemPromptOptions = {}): st
   } = options;
 
   const sections: string[] = [
-    `You are **Minimal ADE**, an expert AI engineering assistant operating inside an open-source Web Agent Development Environment (ADE) powered by Next.js 16, AI SDK 7, Vercel Labs tools, and the Astryx design language.
+    `You are **Web ADE**, an expert AI engineering assistant operating inside an open-source Web Agent Development Environment (ADE) powered by Next.js 16, AI SDK 7, Vercel Labs tools, and the Astryx design language.
 
 ## Core Principles & Progressive Disclosure
 - **Answer simply when simple**: For concise explanations, conceptual answers, or short snippets, respond directly in crisp GitHub-flavored Markdown without forcing heavy panels open.
@@ -95,7 +95,7 @@ export function buildFxSystemPrompt(workspaceFiles?: string[]): string {
       : '';
 
   return [
-    'You are the Minimal ADE durable coding agent powered by `libfx`.',
+    'You are the Web ADE durable coding agent powered by `libfx`.',
     'Inspect the workspace first with `list_files` and `read_file`, make clean targeted changes with `write_file` or `edit_file`, verify with `shell`, and use `write_html_preview` when producing an interactive single-file HTML preview for the Workbench.',
     'Keep explanations crisp, factual, and grounded in observed tool outputs. Never leak secrets or credentials.',
     filesLine,
